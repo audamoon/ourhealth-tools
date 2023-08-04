@@ -15,7 +15,8 @@ options.add_argument(
 driver = uc.Chrome(
     browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe", options=options)
 #driver.set_window_size(1000, 1080)
-driver.get('https://metrika.yandex.ru/settings?id=92253875')
+id = "87033584"
+driver.get(f"https://metrika.yandex.ru/settings?id={id}")
 sleep(5)
 def WebMasterReg(driver):
     length = len(driver.find_elements(By.XPATH, ".//span[text()='Привязать к Вебмастеру']/parent::button"))
