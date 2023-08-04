@@ -20,6 +20,13 @@ class SheetManager:
     def read_cell(self,range,isloop=False,i=None):
         return self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=(f"{range}{i}" if isloop else range)).execute()['values'][0][0]
     
+    def write_column_from_array(self,range,value):
+        valueInputOption = 'RAW'
+        body = {
+            'values':[[value1] for value1 in value]#[[value]]
+        }
+        return self.service.spreadsheets().values().update(spreadsheetId=self.sheet_id,range=range,valueInputOption=valueInputOption,body=body).execute()
+    
     def write_cell(self,range,value,isloop=False,i=None):
         valueInputOption = 'USER_ENTERED'
         body = {

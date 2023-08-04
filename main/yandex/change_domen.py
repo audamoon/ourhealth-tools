@@ -12,7 +12,7 @@ sm = SeleniumManager()
 #         if el == "Что-то не так":
 #             row_array.append(j+1)
 # for row_id in row_array:
-for i in range (2,453):
+for i in range (379,420):
     old_url = gs.read_cell("A",True,i)
     new_url = gs.read_cell("B",True,i)
     chopped_old_url = old_url.split("//")
