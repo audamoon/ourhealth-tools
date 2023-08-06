@@ -14,7 +14,7 @@ while choose != 0:
         break
     if sm ==None:
         sm = SeleniumManager()
-        nm = NetCatManager("https://garmonia-stacionar.ru/netcat/admin/#site.map(1)",sm.driver)
+        nm = NetCatManager("https://vrach-psihiatr.ru/netcat/admin/#site.map(1)",sm.driver)
         function_mgr = NetCatFunctions(nm,sm)
         function_mgr.choose_file_path(os.getcwd())
         nm.open_netcat()
@@ -23,10 +23,14 @@ while choose != 0:
         case 1:
             function_mgr.write_active_subs()
         case 2:
-            function_mgr.open_subs()
+            function_mgr.get_sub_children()
         case 3:
             function_mgr.choose_subs()
         case 4:
-            function_mgr.get_sub_children()
+            function_mgr.get_URl()
+        case 5:
+            function_mgr.change_word_in_fields()
+        case 6:
+            function_mgr.get_fields()
         case _:
             break

@@ -1,0 +1,45 @@
+{
+    "string_array": [
+        {
+            "string_name": "Заголовок текста:"
+        },
+        {
+            "string_name": "Подзаголовок 1:"
+        },
+        {
+            "string_name": "Подзаголовок 2:"
+        },
+        {
+            "string_name": "Подзаголовок 3:"
+        }
+    ],
+    "text_array": [
+        {
+            "textarea_name": "Текст на баннере:"
+        },
+        {
+            "textarea_name": "Текстовый блок 1:"
+        },
+        {
+            "textarea_name": "Описание фотографии:"
+        },
+        {
+            "textarea_name": "Текстовый блок 2:"
+        },
+        {
+            "textarea_name": "Описание:"
+        },
+        {
+            "textarea_name": "Текстовый блок 3:"
+        },
+        {
+            "textarea_name": "Микро разметка видео:"
+        },
+        {
+            "textarea_name": "Видео:"
+        },
+        {
+            "textarea_name": "Описание:"
+        }
+    ]
+}
