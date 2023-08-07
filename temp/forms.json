@@ -7,21 +7,9 @@
         {
             "string_name": "Подзаголовок 1:",
             "string_id": "nc_capfld_632"
-        },
-        {
-            "string_name": "Подзаголовок 2:",
-            "string_id": "nc_capfld_634"
-        },
-        {
-            "string_name": "Подзаголовок 3:",
-            "string_id": "nc_capfld_656"
         }
     ],
     "text_array": [
-        {
-            "textarea_name": "Текст на баннере:",
-            "textarea_id": "nc_capfld_631"
-        },
         {
             "textarea_name": "Текстовый блок 1:",
             "textarea_id": "nc_capfld_633"
@@ -41,14 +29,6 @@
         {
             "textarea_name": "Текстовый блок 3:",
             "textarea_id": "nc_capfld_655"
-        },
-        {
-            "textarea_name": "Микро разметка видео:",
-            "textarea_id": "nc_capfld_748"
-        },
-        {
-            "textarea_name": "Видео:",
-            "textarea_id": "nc_capfld_749"
         },
         {
             "textarea_name": "Описание:",

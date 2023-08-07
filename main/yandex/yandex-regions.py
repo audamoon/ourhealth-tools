@@ -61,60 +61,60 @@ driver = uc.Chrome(
 #         for el in link_el:
 #             file1.write(f"{el.text} \n")
 
-for cell_num in range (1060,1062):
-    print("Row num: ", cell_num)
-    url = gs.readCell(f"A{cell_num}",service,sheet_id)
-    url_splited = url.split("//")
-    yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
-    gs.writeCell(f"C{cell_num}",service,sheet_id,yandex_url)
-    try:
-        driver.get(yandex_url)
-        driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
-        gs.writeCell(f"B{cell_num}",service,sheet_id,"Не установлена яндекс метрика")
-    except:
-        try:
-            elements = driver.execute_script("let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
-            if len(elements) != 0:
-                for el in elements:
-                    el.click()
-                    sleep(1)
-                    gs.writeCell(f"B{cell_num}",service,sheet_id,"Добавлен")
-            else:
-                gs.writeCell(f"B{cell_num}",service,sheet_id,"Уже был")
-        except:
-            gs.writeCell(f"B{cell_num}",service,sheet_id,"Чета не так")
+# for cell_num in range (1060,1062):
+#     print("Row num: ", cell_num)
+#     url = gs.readCell(f"A{cell_num}",service,sheet_id)
+#     url_splited = url.split("//")
+#     yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
+#     gs.writeCell(f"C{cell_num}",service,sheet_id,yandex_url)
+#     try:
+#         driver.get(yandex_url)
+#         driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
+#         gs.writeCell(f"B{cell_num}",service,sheet_id,"Не установлена яндекс метрика")
+#     except:
+#         try:
+#             elements = driver.execute_script("let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
+#             if len(elements) != 0:
+#                 for el in elements:
+#                     el.click()
+#                     sleep(1)
+#                     gs.writeCell(f"B{cell_num}",service,sheet_id,"Добавлен")
+#             else:
+#                 gs.writeCell(f"B{cell_num}",service,sheet_id,"Уже был")
+#         except:
+#             gs.writeCell(f"B{cell_num}",service,sheet_id,"Чета не так")
        
 
 #
 # КОД ДЛЯ ДОБАВЛЕНИЯ РЕГИОНОВ В ВЕБМАСТЕРЕ
 #
 
-# for cell_num in range (859,972):
-#     print(cell_num)
-#     url = gs.readCell(f"A{cell_num}",service,sheet_id)
-#     url_splited = url.split("//")
-#     city_name = gs.readCell(f"B{cell_num}",service,sheet_id)
-#     contact_url = url + "/kontakty/" 
-#     yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/serp-snippets/regions/"
-#     gs.writeCell(f"D{cell_num}",service,sheet_id,yandex_url)
-#     try:
-#         driver.get(yandex_url)
-#         driver.find_element(By.XPATH, '(//li[@class="regions-list__item"][text()="регион сайта не задан"])[2]')
-#         driver.find_element(By.XPATH, "(//button)[5]").click()
-#         driver.find_element(By.XPATH, "(//button)[6]").click()
-#         saveRegion(driver,city_name,contact_url)
-#         # WebDriverWait(driver, 10).until(
-#         #         EC.presence_of_element_located((By.XPATH, "(//div[@class='contact_item'])[1]")))
-#         # city_name = driver.find_element(By.XPATH, "(//div[@class='contact_item'])[1]").text.split(',')[0]
-#         gs.writeCell(f"C{cell_num}",service,sheet_id,"Добавлен")
-#     except:
-#         try:
-#             driver.find_element(By.XPATH, f"(//li[@class='regions-list__item'][contains(text(),'{city_name}')])")
-#             gs.writeCell(f"C{cell_num}",service,sheet_id,"Уже был")
-#             sleep(1)
-#         except:
-#             gs.writeCell(f"C{cell_num}",service,sheet_id,"Чета не так")
-#             sleep(1)
+for cell_num in range (859,972):
+    print(cell_num)
+    url = gs.readCell(f"A{cell_num}",service,sheet_id)
+    url_splited = url.split("//")
+    city_name = gs.readCell(f"B{cell_num}",service,sheet_id)
+    contact_url = url + "/kontakty/" 
+    yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/serp-snippets/regions/"
+    gs.writeCell(f"D{cell_num}",service,sheet_id,yandex_url)
+    try:
+        driver.get(yandex_url)
+        driver.find_element(By.XPATH, '(//li[@class="regions-list__item"][text()="регион сайта не задан"])[2]')
+        driver.find_element(By.XPATH, "(//button)[5]").click()
+        driver.find_element(By.XPATH, "(//button)[6]").click()
+        saveRegion(driver,city_name,contact_url)
+        # WebDriverWait(driver, 10).until(
+        #         EC.presence_of_element_located((By.XPATH, "(//div[@class='contact_item'])[1]")))
+        # city_name = driver.find_element(By.XPATH, "(//div[@class='contact_item'])[1]").text.split(',')[0]
+        gs.writeCell(f"C{cell_num}",service,sheet_id,"Добавлен")
+    except:
+        try:
+            driver.find_element(By.XPATH, f"(//li[@class='regions-list__item'][contains(text(),'{city_name}')])")
+            gs.writeCell(f"C{cell_num}",service,sheet_id,"Уже был")
+            sleep(1)
+        except:
+            gs.writeCell(f"C{cell_num}",service,sheet_id,"Чета не так")
+            sleep(1)
 
 #
 #    КОНЕЦ КОДА

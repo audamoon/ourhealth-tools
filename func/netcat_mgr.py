@@ -46,6 +46,11 @@ class subdivisionFactory:
 
 
 class NetCatFunctions:
+    old_words = ["Татьяны Карповой", "Карповой",
+                 "Москвы", "г. Москва", "в Москве"]
+    new_words = ["Екатерины Стукаловой", "Стукаловой",
+                 "Санкт-Петербурга", "г. Санкт-Петербург", "в Санкт-Петербурге"]
+
     def __init__(self, netcat_mgr, selenium_mgr) -> None:
         self.nm = netcat_mgr
         self.sm = selenium_mgr
@@ -154,7 +159,6 @@ class NetCatFunctions:
         self.nm.switch_frame("default")
         with open(self.folder_path + "/temp/forms.json", "r", encoding="UTF-8") as forms_file:
             forms_name = json.load(forms_file)
-
         for str_names in forms_name["string_array"]:
             el = self.sm.el_by_xpath(
                 f"//span[@id='{str_names['string_id']}']/parent::div")
@@ -163,37 +167,38 @@ class NetCatFunctions:
             input_text = input.get_attribute("value")
             if input_text == False:
                 continue
-            if "Татьяны Карповой" in input_text:
-                input_text = input_text.replace("Татьяны Карповой","Екатерины Стукаловой")
-            if "Карповой" in input_text:
-                input_text = input_text.replace("Карповой","Стукаловой")
+            input_text = self.change_doctor(
+                input_text, self.old_words, self.new_words)
 
             input.click()
             input.clear()
             input.send_keys(input_text)
-            
+
         for text_names in forms_name["text_array"]:
             el = self.sm.el_by_xpath(
                 f"//span[@id='{text_names['textarea_id']}']/parent::div")
 
-            textarea_text = el.find_element(By.XPATH, "./textarea").get_attribute("textContent")
+            textarea_text = el.find_element(
+                By.XPATH, "./textarea").get_attribute("textContent")
             if textarea_text == False:
                 continue
 
-            if "Татьяны Карповой" in textarea_text:
-                textarea_text = textarea_text.replace("Татьяны Карповой","Екатерины Стукаловой")
-            if "Карповой" in textarea_text:
-                textarea_text = textarea_text.replace("Карповой","Стукаловой")
+            textarea_text = self.change_doctor(
+                textarea_text, self.old_words, self.new_words)
 
             source_btn = el.find_element(
                 By.XPATH, ".//a[@class='cke_button cke_button__source cke_button_off']")
-            
+
             source_btn.click()
-            textarea = el.find_element(By.XPATH,".//textarea[@dir]")
+            textarea = el.find_element(By.XPATH, ".//textarea[@dir]")
             textarea.click()
             textarea.clear()
             textarea.send_keys(textarea_text)
             source_btn.click()
+
+        savebtn = self.sm.el_by_xpath(
+            f"//div[@class='nc-modal-dialog-footer']/button[text()='Сохранить']")
+        savebtn.click()
 
     def get_sub_children(self):
         """Находит детей выбранных разделов и записывает их в файл
@@ -218,32 +223,67 @@ class NetCatFunctions:
 
         with open(os.getcwd() + "/temp/subdivisions.json", "w", encoding="UTF-8") as subdivisions_file:
             json.dump(subs_to_json, subdivisions_file, ensure_ascii=None)
-    
-    def change_menu_tab(self,main_tab,is_additional_tabs=False,additional_tab=""):
+
+    def change_menu_tab(self, main_tab, is_additional_tabs=False, additional_tab=""):
         self.nm.switch_frame("default")
-        choosed_tab  = self.sm.els_by_xpath(f"//ul[@id='mainViewTabs']/li/span[text({main_tab})]")
+        choosed_tab = self.sm.el_by_xpath(
+            f"//ul[@id='mainViewTabs']/li/span[text()='{main_tab}']")
         choosed_tab.click()
         sleep(1)
         if is_additional_tabs:
-            choosed_additional_tab = f"//ul[@id='mainViewToolbar']/div/li[text({additional_tab})]"
+            choosed_additional_tab = self.sm.el_by_xpath(
+                f"//ul[@id='mainViewToolbar']/div/li[text()='{additional_tab}']")
             choosed_additional_tab.click()
 
     def seo_change(self):
+        self.change_menu_tab("Настройки", True, "SEO/SMO")
+        sleep(1)
         self.nm.switch_frame("center")
+        self.change_input("//input[@name='title']")
+        self.change_input("//input[@name='h1']")
+        edit_btn = self.sm.el_by_xpath(
+            "//div[contains(text(),'Описание страницы для поисковиков:')]/div/div[@class='cm_switcher']/span[1]/input")
+        edit_btn.click()
+        textarea = self.sm.el_by_xpath("//textarea[@id='description']")
+        textarea_text = self.change_doctor(
+            textarea.text, self.old_words, self.new_words)
+        textarea.click()
+        textarea.clear()
+        textarea.send_keys(textarea_text)
+        self.nm.switch_frame("default")
+        savebtn = self.sm.el_by_xpath("//div[@title='Сохранить изменения']")
+        savebtn.click()
 
     def edit_sub(self):
         self.nm.switch_frame("center")
-        edit_btn = self.sm.el_by_xpath("//i[@class='nc-icon nc--edit']/parent::a")
+        edit_btn = self.sm.el_by_xpath(
+            "//i[@class='nc-icon nc--edit']/parent::a")
         edit_btn.click()
 
-    def change_input(self,input_path,new_value):
+    def change_input(self, input_path):
         input = self.sm.el_by_xpath(input_path)
         input_text = input.get_attribute("value")
-        input_text
-        
-    def change_doctor(self,text):
-        if "Татьяны Карповой" in text:
-                text = text.replace("Татьяны Карповой","Екатерины Стукаловой")
-        if "Карповой" in text:
-                text = text.replace("Карповой","Стукаловой")
+        input_text = self.change_doctor(
+            input_text, self.old_words, self.new_words)
+        input.click()
+        input.clear()
+        input.send_keys(input_text)
+
+    def change_doctor(self, text, old_words, new_words):
+        for i in range(len(old_words)):
+            if old_words[i] in text:
+                text = text.replace(old_words[i], new_words[i])
         return text
+
+    def change_all_names(self):
+        with open(os.getcwd() + "/temp/subdivisions.json", "r", encoding="UTF-8") as subdivisions_file:
+            choosed_subs = json.load(subdivisions_file)
+        for sub in choosed_subs:
+            self.sm.driver.get(sub["sub_URL"])
+            sleep(3)
+            self.edit_sub()
+            sleep(1)
+            self.change_word_in_fields()
+            sleep(3)
+            self.seo_change()
+            sleep(3)

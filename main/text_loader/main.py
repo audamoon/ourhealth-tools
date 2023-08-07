@@ -12,7 +12,7 @@ while choose != 0:
     choose = int(input("Ввод: "))
     if choose == 0:
         break
-    if sm ==None:
+    if sm == None:
         sm = SeleniumManager()
         nm = NetCatManager("https://vrach-psihiatr.ru/netcat/admin/#site.map(1)",sm.driver)
         function_mgr = NetCatFunctions(nm,sm)
@@ -21,9 +21,9 @@ while choose != 0:
         sleep(5)
     match choose:
         case 1:
-            function_mgr.write_active_subs()
+            pass
         case 2:
-            function_mgr.get_sub_children()
+            function_mgr.get_fields()
         case 3:
             function_mgr.choose_subs()
         case 4:
@@ -31,6 +31,6 @@ while choose != 0:
         case 5:
             function_mgr.change_word_in_fields()
         case 6:
-            function_mgr.get_fields()
+            function_mgr.change_all_names()
         case _:
             break
