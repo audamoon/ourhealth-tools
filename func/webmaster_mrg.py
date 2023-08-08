@@ -11,6 +11,27 @@ class WebmasterManager:
         self.sm = driver
         self.gs = SheetManager(sheet_id)
 
+    def sitemap_reload(self,i):
+        print("Row num: ", i)
+        url = self.gs.read_cell("A", True, i)
+        url_splited = url.split("//")
+        url_splited = url.split("//")
+        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
+        self.gs.write_cell("H", yandex_url, True, i)
+        try:
+            self.sm.driver.get(yandex_url)
+            self.sm.el_by_xpath("//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']")
+            btn = self.sm.el_by_xpath("//button[contains(@class,'button_size_xs')]/parent::div")
+            btn.click()
+            sm.wait_until_presence("//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
+            self.gs.write_cell("G", "Отправлено", True, i)
+        except:
+            try:
+                self.sm.el_by_xpath("//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
+                self.gs.write_cell("G", "Уже было", True, i)
+            except:
+                self.gs.write_cell("G", "Чета не так", True, i)
+
     def bypass_counters(self, i):
         print("Row num: ", i)
         url = self.gs.read_cell("A", True, i)
@@ -80,13 +101,15 @@ class WebmasterManager:
         for page_n in range(1, int(pages)+1):
             self.sm.driver.get(f"https://webmaster.yandex.ru/sites/?page={page_n}")
             sleep(0.5)
-            links = self.sm.driver.find_elements(By.XPATH,f"//a[@class='Link SitesTableCell-Hostname']")
-            for el in links:
+            links_el = self.sm.driver.find_elements(By.XPATH,f"//a[@class='Link SitesTableCell-Hostname']")
+            for el in links_el:
                 links.append(el.text)
         self.gs.write_column_from_array(f"B1:B{len(links)}",links)
+
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
-# for cell_num in range(1, 908):
-    
-#     sleep(1.5)
-wm.collect_sites(971)
+# for el in wm.gs.find_cell_with_word("E","Уже был"):
+#     wm.bypass_counters(el)
+for cell_num in range(1, 908):
+    wm.sitemap_reload(cell_num)
+    sleep(1.5)

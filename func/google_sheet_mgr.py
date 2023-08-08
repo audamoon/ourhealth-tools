@@ -37,3 +37,12 @@ class SheetManager:
     def get_values(self,range):
         real_range = f"{range}:{range}"
         return self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=real_range).execute()['values']
+
+    def find_cell_with_word(self,sheet_range,word):
+        status_from_sheet = self.get_values(sheet_range)
+        array_of_n = []
+        for i in range(len(status_from_sheet)):
+            if status_from_sheet[i][0] == word:
+                el_n = i + 1
+                array_of_n.append(el_n)
+        return array_of_n
