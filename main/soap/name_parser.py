@@ -30,4 +30,4 @@ for els in a:
             print(f"Error connecting to the website: {e}")
             array.append("Не нашёл")
 print(array)
-gs.write_cell("B682:B908",array)
+gs.write_column_from_array("B682:B908",array)
