@@ -11,6 +11,29 @@ class WebmasterManager:
         self.sm = driver
         self.gs = SheetManager(sheet_id)
 
+    def bypass_counters(self, i):
+        print("Row num: ", cell_num)
+        url = self.gs.read_cell("A", True, i)
+        url_splited = url.split("//")
+        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
+        self.gs.write_cell("F", yandex_url, True, i)
+        try:
+            self.sm.driver.get(yandex_url)
+            self.sm.driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
+            self.gs.write_cell("E", "Не установлена яндекс метрика", True, i)
+        except:
+            try:
+                elements = self.sm.driver.execute_script("let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
+                if len(elements) != 0:
+                    for el in elements:
+                        el.click()
+                        sleep(1)
+                        self.gs.write_cell("E", "Добавлен", True, i)
+                else:
+                    self.gs.write_cell("E", "Уже был", True, i)
+            except:
+                self.gs.write_cell("E", "Чета не так", True, i)
+
     def add_region(self, i):
         url = self.gs.read_cell("A", True, i)
         url_splited = url.split("//")
@@ -55,5 +78,4 @@ class WebmasterManager:
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
 for cell_num in range(1, 908):
-    print(cell_num)
-    wm.add_region(cell_num)
+    
