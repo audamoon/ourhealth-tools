@@ -12,7 +12,7 @@ class WebmasterManager:
         self.gs = SheetManager(sheet_id)
 
     def bypass_counters(self, i):
-        print("Row num: ", cell_num)
+        print("Row num: ", i)
         url = self.gs.read_cell("A", True, i)
         url_splited = url.split("//")
         yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
@@ -74,8 +74,19 @@ class WebmasterManager:
             self.sm.driver.refresh()
             sleep(4)
 
-
+    def collect_sites(self,amount_of_sites):
+        pages = (amount_of_sites/20)+1
+        links = []
+        for page_n in range(1, int(pages)+1):
+            self.sm.driver.get(f"https://webmaster.yandex.ru/sites/?page={page_n}")
+            sleep(0.5)
+            links = self.sm.driver.find_elements(By.XPATH,f"//a[@class='Link SitesTableCell-Hostname']")
+            for el in links:
+                links.append(el.text)
+        self.gs.write_column_from_array(f"B1:B{len(links)}",links)
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
-for cell_num in range(1, 908):
+# for cell_num in range(1, 908):
     
+#     sleep(1.5)
+wm.collect_sites(971)
