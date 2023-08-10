@@ -60,7 +60,7 @@ class WebmasterManager:
         url_splited = url.split("//")
         city_name = self.gs.read_cell("B", True, i)
         print(url,city_name)
-        contact_url = url + "/contacts/"
+        contact_url = url + "/kontakty/"
         yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/serp-snippets/regions/"
         self.gs.write_cell("D", yandex_url, True, i)
         try:
@@ -108,8 +108,9 @@ class WebmasterManager:
 
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
-# for el in wm.gs.find_cell_with_word("E","Уже был"):
-#     wm.bypass_counters(el)
-for cell_num in range(1, 908):
-    wm.sitemap_reload(cell_num)
+for el in wm.gs.find_cell_with_word("G","Уже было"):
+    wm.sitemap_reload(el)
     sleep(1.5)
+# for cell_num in range(815, 830):
+#     wm.sitemap_reload(cell_num)
+#     sleep(2.5)

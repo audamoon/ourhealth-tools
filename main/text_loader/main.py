@@ -32,5 +32,7 @@ while choose != 0:
             function_mgr.change_word_in_fields()
         case 6:
             function_mgr.change_all_names()
+        case 7:
+            pass
         case _:
             break

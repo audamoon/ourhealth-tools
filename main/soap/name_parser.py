@@ -2,8 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 from func.google_sheet_mgr import SheetManager
 
-gs = SheetManager("1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
-a = gs.get_values("A682:A908")
+gs = SheetManager("1WsAf_t2PuLD4qowmv5zYyp7YMNpyuSsN0Ir35u5aWQk")
+a = gs.get_values("A")
 array = []
 for els in a:
     print(els)
@@ -18,11 +18,10 @@ for els in a:
                 soup = BeautifulSoup(response.content, 'html.parser')
 
                 # Find all elements with the class "open-modal city"
-                elements = soup.find_all(class_="open-modal city")
+                elements = soup.find_all(class_="contacts-page__wrapper content-body")
 
                 # Print the text content of each element
-                for element in elements:
-                    array.append(element.text.strip().replace("+ ",""))
+                array.append(elements[0].findChildren("p")[3].text.strip().split(',')[0].replace("Адрес: ",""))
             else:
                 print(f"Failed to connect. Status code: {response.status_code}")
                 array.append("Не нашёл")
@@ -30,4 +29,4 @@ for els in a:
             print(f"Error connecting to the website: {e}")
             array.append("Не нашёл")
 print(array)
-gs.write_column_from_array("B682:B908",array)
+gs.write_column_from_array("B1:B20",array)
