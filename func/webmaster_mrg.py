@@ -15,7 +15,6 @@ class WebmasterManager:
         print("Row num: ", i)
         url = self.gs.read_cell("A", True, i)
         url_splited = url.split("//")
-        url_splited = url.split("//")
         yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
         self.gs.write_cell("H", yandex_url, True, i)
         try:
@@ -56,6 +55,7 @@ class WebmasterManager:
                 self.gs.write_cell("E", "Чета не так", True, i)
 
     def add_region(self, i):
+        print("Row num: ", i)
         url = self.gs.read_cell("A", True, i)
         url_splited = url.split("//")
         city_name = self.gs.read_cell("B", True, i)
@@ -106,11 +106,32 @@ class WebmasterManager:
                 links.append(el.text)
         self.gs.write_column_from_array(f"B1:B{len(links)}",links)
 
+    def add_sitemap(self, i):
+        print("Row num: ", i)
+        url = self.gs.read_cell("A", True, i)
+        url_splited = url.split("//")
+        sitemap = url + "/sitemaps/"
+        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
+        self.sm.driver.get(yandex_url)
+        self.gs.write_cell("C", yandex_url, True, i)
+        try:
+            self.sm.wait_until_presence("//input[@name='sitemapUrl']")
+            input = self.sm.el_by_xpath("//input[@name='sitemapUrl']")
+            input.click()
+            input.clear()
+            input.send_keys(sitemap)
+            self.sm.el_by_xpath("//span[@class='button__text'][text()='Добавить']/parent::button").click()
+            self.sm.wait_until_presence("//p[@class='sitemap-files__queue-title'][text()='Очередь на обработку']")
+            self.gs.write_cell("B", "Добавлен", True, i)
+        except:
+            self.gs.write_cell("B", "Чета не так", True, i)
+
+
 sm = SeleniumManager()
-wm = WebmasterManager(sm,"1_lxCGttccBF3TMbEsuFHbsvQ-e9_x3Anl9zutX0xfQE")
-for el in wm.gs.find_cell_with_word("G","Уже было"):
-    wm.sitemap_reload(el)
+wm = WebmasterManager(sm,"1WsAf_t2PuLD4qowmv5zYyp7YMNpyuSsN0Ir35u5aWQk")
+# for el in wm.gs.find_cell_with_word("G","Уже было"):
+#     wm.sitemap_reload(el)
+#     sleep(1.5)
+for cell_num in range(1, 830):
+    wm.add_sitemap(cell_num)
     sleep(1.5)
-# for cell_num in range(815, 830):
-#     wm.sitemap_reload(cell_num)
-#     sleep(2.5)
