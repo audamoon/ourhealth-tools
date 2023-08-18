@@ -125,13 +125,34 @@ class WebmasterManager:
             self.gs.write_cell("B", "Добавлен", True, i)
         except:
             self.gs.write_cell("B", "Чета не так", True, i)
+    
+    def open_url():
+        pass
+    
+    def add_turbo():
+        pass
+        # https://webmaster.yandex.com/site/
+        # https:spb.metod-dovzhenko.com
+        # :443
+        # /turbo/sources/
+
+        # 1) //input[@name='feedUrl']
+        # 2) //button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']
+        # wait
+        # 3) //td[text()='Без ошибок']
+        # 4) //div[text()='Откл']/parent::div
+        # wait
+        # 5) //button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']
+        # wait //td[text()='Проверяется']
+
 
 
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1WsAf_t2PuLD4qowmv5zYyp7YMNpyuSsN0Ir35u5aWQk")
+wm.
 # for el in wm.gs.find_cell_with_word("G","Уже было"):
 #     wm.sitemap_reload(el)
 #     sleep(1.5)
-for cell_num in range(1, 830):
-    wm.add_sitemap(cell_num)
-    sleep(1.5)
+# for cell_num in range(1, 830):
+#     wm.add_sitemap(cell_num)
+#     sleep(1.5)

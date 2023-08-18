@@ -15,7 +15,7 @@ options.add_argument(
 driver = uc.Chrome(
     browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe", options=options)
 #driver.set_window_size(1000, 1080)
-id = "87033584"
+id = "94633022"
 driver.get(f"https://metrika.yandex.ru/settings?id={id}")
 sleep(5)
 def WebMasterReg(driver):

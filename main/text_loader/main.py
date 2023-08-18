@@ -14,7 +14,7 @@ while choose != 0:
         break
     if sm == None:
         sm = SeleniumManager()
-        nm = NetCatManager("https://vrach-psihiatr.ru/netcat/admin/#site.map(1)",sm.driver)
+        nm = NetCatManager("https://garmonia-stacionar.ru/netcat/admin/#object.list(162)",sm.driver)
         function_mgr = NetCatFunctions(nm,sm)
         function_mgr.choose_file_path(os.getcwd())
         nm.open_netcat()
