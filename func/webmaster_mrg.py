@@ -126,33 +126,53 @@ class WebmasterManager:
         except:
             self.gs.write_cell("B", "Чета не так", True, i)
     
-    def open_url():
-        pass
+    def __open_url(self,row_num,get_link_col,write_link_col,add_subfolder):
+        print("Row num: ", row_num)
+        url = self.gs.read_cell(get_link_col, True, row_num)
+        url_splited = url.split("//")
+        print(url_splited)
+        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443{add_subfolder}"
+        self.sm.driver.get(yandex_url)
+        self.gs.write_cell(write_link_col, yandex_url, True, row_num)
     
-    def add_turbo():
-        pass
-        # https://webmaster.yandex.com/site/
-        # https:spb.metod-dovzhenko.com
-        # :443
-        # /turbo/sources/
+    def add_turbo(self,row_num):
+        self.__open_url(row_num,"ТУРБО!B","ТУРБО!H","/turbo/sources/")
+        turbo = self.gs.read_cell("ТУРБО!D", True, row_num)
+        try: 
+            self.sm.el_by_xpath("//div[contains(text(),'вам не принадлежит')]")
+            self.gs.write_cell("ТУРБО!F", "не принадлежит", True, row_num)
+        except:
+            try:  
+                self.sm.wait_until_presence("//input[@name='feedUrl']")
 
-        # 1) //input[@name='feedUrl']
-        # 2) //button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']
-        # wait
-        # 3) //td[text()='Без ошибок']
-        # 4) //div[text()='Откл']/parent::div
-        # wait
-        # 5) //button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']
-        # wait //td[text()='Проверяется']
+                self.sm.el_by_xpath("//input[@name='feedUrl']").click()
+                self.sm.el_by_xpath("//input[@name='feedUrl']").clear()
+                self.sm.el_by_xpath("//input[@name='feedUrl']").send_keys(turbo)
+
+                self.sm.el_by_xpath("//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
+                
+                self.sm.wait_until_presence("//td[text()='Без ошибок']")
+                self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
+
+                self.sm.wait_until_presence("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']")
+                self.sm.el_by_xpath("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
+
+                self.sm.wait_until_presence("//td[text()='Проверяется']")
+                self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
+            except:
+                self.gs.write_cell("ТУРБО!F", "Что-то не так", True, row_num)
+
 
 
 
 sm = SeleniumManager()
-wm = WebmasterManager(sm,"1WsAf_t2PuLD4qowmv5zYyp7YMNpyuSsN0Ir35u5aWQk")
-wm.
+wm = WebmasterManager(sm,"1tyOpLAD0Sfv8u7iRvfIMCMXhh5cZoZOEegloEwSGbd8")
+for row_num in range(7,len(wm.gs.get_values("B","ТУРБО"))):
+    wm.add_turbo(row_num)
+    sleep(5)
+
+
+#Для отладки 
 # for el in wm.gs.find_cell_with_word("G","Уже было"):
 #     wm.sitemap_reload(el)
-#     sleep(1.5)
-# for cell_num in range(1, 830):
-#     wm.add_sitemap(cell_num)
 #     sleep(1.5)

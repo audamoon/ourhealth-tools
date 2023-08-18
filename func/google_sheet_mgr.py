@@ -34,8 +34,11 @@ class SheetManager:
         }
         return self.service.spreadsheets().values().update(spreadsheetId=self.sheet_id,range=(f"{range}{i}" if isloop else range),valueInputOption=valueInputOption,body=body).execute()
     
-    def get_values(self,range):
-        real_range = f"{range}:{range}"
+    def get_values(self,range,list = None):
+        if list == None:
+            real_range = f"{range}:{range}"
+        else:
+            real_range = f"{list}!{range}:{range}"
         return self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=real_range).execute()['values']
 
     def find_cell_with_word(self,sheet_range,word):
