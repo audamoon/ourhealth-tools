@@ -41,8 +41,11 @@ class SheetManager:
             real_range = f"{list}!{range}:{range}"
         return self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=real_range).execute()['values']
 
-    def find_cell_with_word(self,sheet_range,word):
-        status_from_sheet = self.get_values(sheet_range)
+    def find_cell_with_word(self,sheet_range,word,list=None):
+        if list == None:
+            status_from_sheet = self.get_values(sheet_range)
+        else:
+            status_from_sheet = self.get_values(sheet_range,list)
         array_of_n = []
         for i in range(len(status_from_sheet)):
             if status_from_sheet[i][0] == word:

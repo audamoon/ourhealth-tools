@@ -102,9 +102,12 @@ class WebmasterManager:
             self.sm.driver.get(f"https://webmaster.yandex.ru/sites/?page={page_n}")
             sleep(0.5)
             links_el = self.sm.driver.find_elements(By.XPATH,f"//a[@class='Link SitesTableCell-Hostname']")
+            # for el in links_el:
+            #     links.append(el.text)
             for el in links_el:
-                links.append(el.text)
-        self.gs.write_column_from_array(f"B1:B{len(links)}",links)
+                if ".clinic" in el.text:
+                    links.append(el.text)
+        self.gs.write_column_from_array(f"A1:A{len(links)}",links)
 
     def add_sitemap(self, i):
         print("Row num: ", i)
@@ -153,26 +156,46 @@ class WebmasterManager:
                 
                 self.sm.wait_until_presence("//td[text()='Без ошибок']")
                 self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
-
-                self.sm.wait_until_presence("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']")
-                self.sm.el_by_xpath("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
-
-                self.sm.wait_until_presence("//td[text()='Проверяется']")
-                self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
+                try:
+                    self.sm.wait_until_presence("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']",5)
+                    self.sm.el_by_xpath("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
+                    self.sm.wait_until_presence("//td[text()='Проверяется']")
+                    self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
+                except:
+                    self.sm.wait_until_presence("//td[text()='Проверяется']")
+                    self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
             except:
                 self.gs.write_cell("ТУРБО!F", "Что-то не так", True, row_num)
 
+    def add_metrika(self,row_num):
+        self.__open_url(row_num, "A", "C", "/settings/metrika/")
+        sleep(0.5)
+        try:
+            self.sm.driver.find_element(By.XPATH,"//*[text()='Связан с сайтом в Вебмастере']")
+            return "Был"
+        except:
+            try:
+                btn_path = "//span[text()='Подтвердить']/parent::button"
+                self.sm.driver.find_element(By.XPATH,btn_path).click()
+                self.sm.wait_until_presence("//*[text()='Связан с сайтом в Вебмастере']")
+                return "Добавлен"
+            except:
+                return "Ошибка"    
 
-
+    def save_load(self,row_num,status_array): 
+        self.gs.write_column_from_array(f"B{row_num-9}:{row_num + len(status_array) - 1}", status_array)
 
 sm = SeleniumManager()
-wm = WebmasterManager(sm,"1tyOpLAD0Sfv8u7iRvfIMCMXhh5cZoZOEegloEwSGbd8")
-for row_num in range(7,len(wm.gs.get_values("B","ТУРБО"))):
-    wm.add_turbo(row_num)
-    sleep(5)
+wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 
+status_array = []
+for row_num in range(1,1268):
+    status_array.append(wm.add_metrika(row_num))
+    if row_num % 10 == 0:
+        wm.save_load(row_num,status_array)
+        status_array = []
 
-#Для отладки 
-# for el in wm.gs.find_cell_with_word("G","Уже было"):
-#     wm.sitemap_reload(el)
-#     sleep(1.5)
+#Для отладки 55 103
+# for row_num in wm.gs.find_cell_with_word("F","не принадлежит","ТУРБО"):
+#     wm.add_turbo(row_num)
+#     sleep(5)
