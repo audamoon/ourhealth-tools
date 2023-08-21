@@ -31,16 +31,16 @@ class WebmasterManager:
             except:
                 self.gs.write_cell("G", "Чета не так", True, i)
 
-    def bypass_counters(self, i):
-        print("Row num: ", i)
-        url = self.gs.read_cell("A", True, i)
-        url_splited = url.split("//")
-        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
-        self.gs.write_cell("F", yandex_url, True, i)
+    def bypass_counters(self, row_num):
+        self.__open_url(row_num,"A","E","/indexing/crawl-metrika/")
+        # print("Row num: ", row_num)
+        # url = self.gs.read_cell("A", True, row_num)
+        # url_splited = url.split("//")
+        # yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
+        # self.gs.write_cell("D", yandex_url, True, row_num)
         try:
-            self.sm.driver.get(yandex_url)
             self.sm.driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
-            self.gs.write_cell("E", "Не установлена яндекс метрика", True, i)
+            return "Не установлена яндекс метрика"
         except:
             try:
                 elements = self.sm.driver.execute_script("let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
@@ -48,10 +48,13 @@ class WebmasterManager:
                     for el in elements:
                         el.click()
                         sleep(1)
+                        return "Добавлен"
                         self.gs.write_cell("E", "Добавлен", True, i)
                 else:
+                    return "Уже был"
                     self.gs.write_cell("E", "Уже был", True, i)
             except:
+                return "Ошибка"
                 self.gs.write_cell("E", "Чета не так", True, i)
 
     def add_region(self, i):
@@ -182,20 +185,29 @@ class WebmasterManager:
             except:
                 return "Ошибка"    
 
-    def save_load(self,row_num,status_array): 
-        self.gs.write_column_from_array(f"B{row_num-9}:{row_num + len(status_array) - 1}", status_array)
+    def save_load(self,row_num,status_array,range_letter="B"): 
+        if len(status_array) == 10:
+            self.gs.write_column_from_array(f"{range_letter}{row_num-9}:{row_num + len(status_array)}", status_array)
+        if len(status_array) < 10:
+            self.gs.write_column_from_array(f"{range_letter}{row_num-len(status_array)+1}:{row_num}", status_array)
+            
 
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 
+max_range = 1268
 status_array = []
-for row_num in range(1,1268):
-    status_array.append(wm.add_metrika(row_num))
-    if row_num % 10 == 0:
-        wm.save_load(row_num,status_array)
-        status_array = []
 
-#Для отладки 55 103
+for row_num in range(1,max_range):
+    status_array.append(wm.bypass_counters(row_num))
+    if row_num % 10 == 0:
+        wm.save_load(row_num,status_array,"D")
+        status_array = []
+    if max_range - row_num == 1:
+            wm.save_load(row_num,status_array,"D")
+            status_array = []
+
+#Для отладки
 # for row_num in wm.gs.find_cell_with_word("F","не принадлежит","ТУРБО"):
 #     wm.add_turbo(row_num)
 #     sleep(5)
