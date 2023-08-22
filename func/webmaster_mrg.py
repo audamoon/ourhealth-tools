@@ -104,6 +104,10 @@ class WebmasterManager:
                     links.append(el.text)
         self.gs.write_column_from_array(f"A1:A{len(links)}",links)
 
+    def delete_sitemap(self):
+        self.sm.wait_until_presence("//button[@aria-label='Удалить']")
+        self.sm.el_by_xpath("//button[@aria-label='Удалить']").click()
+
     def add_sitemap(self, row_num):
 
         self.__open_url(row_num, "E", "I", "/indexing/sitemap/")
@@ -115,8 +119,9 @@ class WebmasterManager:
         # self.sm.driver.get(yandex_url)
         # self.gs.write_cell("C", yandex_url, True, i)
 
-        sitemap = self.gs.read_cell("D",True, row_num)
+        sitemap = self.gs.read_cell("F",True, row_num)
         try:
+            self.delete_sitemap()
             self.sm.wait_until_presence("//input[@name='sitemapUrl']")
             input = self.sm.el_by_xpath("//input[@name='sitemapUrl']")
             input.click()
@@ -194,7 +199,7 @@ wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 max_range = 1039
 status_array = []
 
-for row_num in range(3,max_range):
+for row_num in range(4,max_range):
     status_array.append(wm.add_sitemap(row_num))
     if row_num % 10 == 0:
         wm.save_load(row_num,status_array,"H")
