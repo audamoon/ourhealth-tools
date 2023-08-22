@@ -33,11 +33,6 @@ class WebmasterManager:
 
     def bypass_counters(self, row_num):
         self.__open_url(row_num,"A","E","/indexing/crawl-metrika/")
-        # print("Row num: ", row_num)
-        # url = self.gs.read_cell("A", True, row_num)
-        # url_splited = url.split("//")
-        # yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/crawl-metrika/"
-        # self.gs.write_cell("D", yandex_url, True, row_num)
         try:
             self.sm.driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
             return "Не установлена яндекс метрика"
@@ -49,13 +44,10 @@ class WebmasterManager:
                         el.click()
                         sleep(1)
                         return "Добавлен"
-                        self.gs.write_cell("E", "Добавлен", True, i)
                 else:
                     return "Уже был"
-                    self.gs.write_cell("E", "Уже был", True, i)
             except:
                 return "Ошибка"
-                self.gs.write_cell("E", "Чета не так", True, i)
 
     def add_region(self, i):
         print("Row num: ", i)
@@ -112,14 +104,18 @@ class WebmasterManager:
                     links.append(el.text)
         self.gs.write_column_from_array(f"A1:A{len(links)}",links)
 
-    def add_sitemap(self, i):
-        print("Row num: ", i)
-        url = self.gs.read_cell("A", True, i)
-        url_splited = url.split("//")
-        sitemap = url + "/sitemaps/"
-        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
-        self.sm.driver.get(yandex_url)
-        self.gs.write_cell("C", yandex_url, True, i)
+    def add_sitemap(self, row_num):
+
+        self.__open_url(row_num, "E", "I", "/indexing/sitemap/")
+        # print("Row num: ", i)
+        # url = self.gs.read_cell("A", True, i)
+        # url_splited = url.split("//")
+        # sitemap = url + "/sitemaps/"
+        # yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
+        # self.sm.driver.get(yandex_url)
+        # self.gs.write_cell("C", yandex_url, True, i)
+
+        sitemap = self.gs.read_cell("D",True, row_num)
         try:
             self.sm.wait_until_presence("//input[@name='sitemapUrl']")
             input = self.sm.el_by_xpath("//input[@name='sitemapUrl']")
@@ -128,9 +124,9 @@ class WebmasterManager:
             input.send_keys(sitemap)
             self.sm.el_by_xpath("//span[@class='button__text'][text()='Добавить']/parent::button").click()
             self.sm.wait_until_presence("//p[@class='sitemap-files__queue-title'][text()='Очередь на обработку']")
-            self.gs.write_cell("B", "Добавлен", True, i)
+            return "Добавлен"
         except:
-            self.gs.write_cell("B", "Чета не так", True, i)
+            return "Ошибка"
     
     def __open_url(self,row_num,get_link_col,write_link_col,add_subfolder):
         print("Row num: ", row_num)
@@ -195,16 +191,16 @@ class WebmasterManager:
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 
-max_range = 1268
+max_range = 1039
 status_array = []
 
-for row_num in range(1,max_range):
-    status_array.append(wm.bypass_counters(row_num))
+for row_num in range(3,max_range):
+    status_array.append(wm.add_sitemap(row_num))
     if row_num % 10 == 0:
-        wm.save_load(row_num,status_array,"D")
+        wm.save_load(row_num,status_array,"H")
         status_array = []
     if max_range - row_num == 1:
-            wm.save_load(row_num,status_array,"D")
+            wm.save_load(row_num,status_array,"H")
             status_array = []
 
 #Для отладки
