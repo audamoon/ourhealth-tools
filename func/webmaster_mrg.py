@@ -7,7 +7,7 @@ from time import sleep
 
 
 class WebmasterManager:
-    def __init__(self, driver, sheet_id) -> None:
+    def __init__(self, driver:SeleniumManager, sheet_id) -> None:
         self.sm = driver
         self.gs = SheetManager(sheet_id)
 
@@ -105,7 +105,7 @@ class WebmasterManager:
         self.gs.write_column_from_array(f"A1:A{len(links)}",links)
 
     def delete_sitemap(self):
-        self.sm.wait_until_presence("//button[@aria-label='Удалить']")
+        self.sm.wait_until_presence("//button[@aria-label='Удалить']",10)
         self.sm.el_by_xpath("//button[@aria-label='Удалить']").click()
 
     def add_sitemap(self, row_num):
@@ -121,7 +121,10 @@ class WebmasterManager:
 
         sitemap = self.gs.read_cell("F",True, row_num)
         try:
-            self.delete_sitemap()
+            try:
+                self.delete_sitemap()
+            except:
+                pass
             self.sm.wait_until_presence("//input[@name='sitemapUrl']")
             input = self.sm.el_by_xpath("//input[@name='sitemapUrl']")
             input.click()
