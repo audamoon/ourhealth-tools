@@ -15,10 +15,10 @@ options.add_argument(
 driver = uc.Chrome(
     browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe", options=options)
 #driver.set_window_size(1000, 1080)
-id = "91257213"
+id = "66051736"
 driver.get(f"https://metrika.yandex.ru/settings?id={id}")
 sleep(5)
-def WebMasterReg(driver):
+def ConnectWebMaster(driver):
     length = len(driver.find_elements(By.XPATH, ".//span[text()='Привязать к Вебмастеру']/parent::button"))
     for i in range(1, length):
         scroll_vаlue = 500
@@ -28,6 +28,6 @@ def WebMasterReg(driver):
             driver.find_element(By.XPATH,f"(.//span[text()='Привязать к Вебмастеру']/parent::button)[{i}]").click()
             i += 1
         except:
-            WebMasterReg(driver)
+            ConnectWebMaster(driver)
             
-WebMasterReg(driver)
+ConnectWebMaster(driver)

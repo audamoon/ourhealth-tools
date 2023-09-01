@@ -109,16 +109,8 @@ class WebmasterManager:
         self.sm.el_by_xpath("//button[@aria-label='Удалить']").click()
 
     def add_sitemap(self, row_num):
-
-        self.__open_url(row_num, "E", "I", "/indexing/sitemap/")
-        # print("Row num: ", i)
-        # url = self.gs.read_cell("A", True, i)
-        # url_splited = url.split("//")
-        # sitemap = url + "/sitemaps/"
-        # yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
-        # self.sm.driver.get(yandex_url)
-        # self.gs.write_cell("C", yandex_url, True, i)
-
+        self.__
+        self.__open_url(row_num, "B", "D", "/indexing/sitemap/")
         sitemap = self.gs.read_cell("F",True, row_num)
         try:
             try:
@@ -199,16 +191,16 @@ class WebmasterManager:
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 
-max_range = 1039
+max_range = 76
 status_array = []
 
-for row_num in range(4,max_range):
+for row_num in range(2,max_range):
     status_array.append(wm.add_sitemap(row_num))
     if row_num % 10 == 0:
-        wm.save_load(row_num,status_array,"H")
+        wm.save_load(row_num,status_array,"C")
         status_array = []
     if max_range - row_num == 1:
-            wm.save_load(row_num,status_array,"H")
+            wm.save_load(row_num,status_array,"C")
             status_array = []
 
 #Для отладки
