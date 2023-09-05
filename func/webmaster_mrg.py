@@ -7,11 +7,92 @@ from time import sleep
 
 
 class WebmasterManager:
-    def __init__(self, driver:SeleniumManager, sheet_id) -> None:
+    def __init__(self, driver: SeleniumManager, sheet_id) -> None:
         self.sm = driver
         self.gs = SheetManager(sheet_id)
 
-    def sitemap_reload(self,i):
+    def other_turbo_shit(self, site):
+        url = site
+        url_splited = url.split("//")
+        #css
+        with open("temp/cobzev/css.txt") as css_f:
+            css = css_f.read().strip()
+        self.sm.driver.get(f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/turbo/settings/css/")    
+        self.sm.driver.find_element(By.XPATH, "//div[@class='CodeMirror-lines']/div/div/pre").send_keys(css)
+        sleep(100)
+        
+
+    def input_values_to_table(self, row_id, names, domens):
+        inputs = self.sm.driver.find_elements(By.XPATH, "//div[@class='turbo-setup-menu__main']//input") 
+        #ссылки четные, имена - нечетные
+        city_link = self.gs.read_cell(f"B{row_id}")
+
+        links = []
+        for domen in domens:
+            links.append(city_link + domen[0])
+        for i in range (len(inputs)//2):
+            #all numbers reversed
+            input_even_number = 2 * i + 1
+            inputs[input_even_number].click()
+            inputs[input_even_number].clear()
+            inputs[input_even_number].send_keys(links[i])
+            input_odd_number = 2 * i
+            inputs[input_odd_number].click()
+            inputs[input_odd_number].clear()
+            inputs[input_odd_number].send_keys(names[i])
+                
+
+        save_btn = self.sm.driver.find_element(By.XPATH, "button button_size_m button_theme_action button_align_left form__submit form__submit_align_left i-bem")
+        save_btn.click()
+
+        
+
+        
+
+    def create_table(self):
+        self.sm.driver.get(
+            "https://webmaster.yandex.ru/site/https:spb.alco.rehab:443/turbo/settings/menu/")
+        
+        sleep(2)
+
+        add_lvl_1_btn = self.sm.driver.find_element(
+            By.XPATH, "//button[@class='button button_size_s button_menu-level_1 button_theme_normal sun-table__turbo-setup-menu-add i-bem']")
+        
+        for i in range(3):
+            add_lvl_1_btn.click()
+        sleep(1)
+
+        for n in range(3):
+
+            amount_of_lvl_2 = [8, 15, 5]
+            amount_of_lvl_3 = [[1, 11], [2], []]
+            numbers_lvl_3 = [[1, 2], [2], []]
+            lvl_1 = self.sm.driver.find_element(
+                By.XPATH, f"//tr[@class='sun-table__row sun-table__row_menu-level_1'][{n+1}]")
+            lvl_1.find_element(By.XPATH, f"./td[2]/span").click()
+            add_lvl_2_btn = lvl_1.find_element(
+                By.XPATH, ".//button[@class='button button_size_s button_menu-level_2 button_theme_normal sun-table__turbo-setup-menu-add i-bem']")
+
+            for j in range(amount_of_lvl_2[n]-1):
+                add_lvl_2_btn.click()
+
+            expand_lvl_3_btns = lvl_1.find_elements(
+                By.XPATH, f".//span[@class='link link_pseudo_yes link_theme_normal link_menu-level_2 sun-table__turbo-setup-submenu-add i-bem']")
+
+            for el in numbers_lvl_3[n]:
+                if len(numbers_lvl_3) == 0:
+                    break
+                expand_lvl_3_btns[el].click()
+
+            add_lvl_3_btns = lvl_1.find_elements(
+                By.XPATH, ".//button[@class='button button_size_s button_menu-level_3 button_theme_normal sun-table__turbo-setup-menu-add i-bem']")
+
+            for k in range(len(numbers_lvl_3[n])):
+                print(f"n = {n}, k = {k}")
+                for lvl3_num in range(amount_of_lvl_3[n][k]-1):
+                    add_lvl_3_btns[k].click()
+
+    def sitemap_reload(self, i):
         print("Row num: ", i)
         url = self.gs.read_cell("A", True, i)
         url_splited = url.split("//")
@@ -19,26 +100,32 @@ class WebmasterManager:
         self.gs.write_cell("H", yandex_url, True, i)
         try:
             self.sm.driver.get(yandex_url)
-            self.sm.el_by_xpath("//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']")
-            btn = self.sm.el_by_xpath("//button[contains(@class,'button_size_xs')]/parent::div")
+            self.sm.el_by_xpath(
+                "//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']")
+            btn = self.sm.el_by_xpath(
+                "//button[contains(@class,'button_size_xs')]/parent::div")
             btn.click()
-            sm.wait_until_presence("//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
+            sm.wait_until_presence(
+                "//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
             self.gs.write_cell("G", "Отправлено", True, i)
         except:
             try:
-                self.sm.el_by_xpath("//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
+                self.sm.el_by_xpath(
+                    "//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
                 self.gs.write_cell("G", "Уже было", True, i)
             except:
                 self.gs.write_cell("G", "Чета не так", True, i)
 
     def bypass_counters(self, row_num):
-        self.__open_url(row_num,"A","E","/indexing/crawl-metrika/")
+        self.__open_url(row_num, "A", "E", "/indexing/crawl-metrika/")
         try:
-            self.sm.driver.find_element(By.XPATH,'//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
+            self.sm.driver.find_element(
+                By.XPATH, '//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
             return "Не установлена яндекс метрика"
         except:
             try:
-                elements = self.sm.driver.execute_script("let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
+                elements = self.sm.driver.execute_script(
+                    "let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
                 if len(elements) != 0:
                     for el in elements:
                         el.click()
@@ -82,19 +169,21 @@ class WebmasterManager:
             self.sm.driver.refresh()
             sleep(4)
 
-    def collect_sites(self,amount_of_sites):
+    def collect_sites(self, amount_of_sites):
         pages = (amount_of_sites/20)+1
         links = []
         for page_n in range(1, int(pages)+1):
-            self.sm.driver.get(f"https://webmaster.yandex.ru/sites/?page={page_n}")
+            self.sm.driver.get(
+                f"https://webmaster.yandex.ru/sites/?page={page_n}")
             sleep(0.5)
-            links_el = self.sm.driver.find_elements(By.XPATH,f"//a[@class='Link SitesTableCell-Hostname']")
+            links_el = self.sm.driver.find_elements(
+                By.XPATH, f"//a[@class='Link SitesTableCell-Hostname']")
             # for el in links_el:
             #     links.append(el.text)
             for el in links_el:
                 if ".clinic" in el.text:
                     links.append(el.text)
-        self.gs.write_column_from_array(f"A1:A{len(links)}",links)
+        self.gs.write_column_from_array(f"A1:A{len(links)}", links)
 
     def delete_sitemap(self):
         self.sm.wait_until_presence("//button[@aria-label='Удалить']",1)
@@ -102,7 +191,7 @@ class WebmasterManager:
 
     def add_sitemap(self, row_num):
         self.__open_url(row_num, "B", "D", "/indexing/sitemap/")
-        sitemap = self.gs.read_cell("F",True, row_num)
+        sitemap = self.gs.read_cell("F", True, row_num)
         try:
             try:
                 self.delete_sitemap()
@@ -113,13 +202,15 @@ class WebmasterManager:
             input.click()
             input.clear()
             input.send_keys(sitemap)
-            self.sm.el_by_xpath("//span[@class='button__text'][text()='Добавить']/parent::button").click()
-            self.sm.wait_until_presence("//p[@class='sitemap-files__queue-title'][text()='Очередь на обработку']")
+            self.sm.el_by_xpath(
+                "//span[@class='button__text'][text()='Добавить']/parent::button").click()
+            self.sm.wait_until_presence(
+                "//p[@class='sitemap-files__queue-title'][text()='Очередь на обработку']")
             return "Добавлен"
         except:
             return "Ошибка"
-    
-    def __open_url(self,row_num,get_link_col,write_link_col,add_subfolder):
+
+    def __open_url(self, row_num, get_link_col, write_link_col, add_subfolder):
         print("Row num: ", row_num)
         url = self.gs.read_cell(get_link_col, True, row_num)
         url_splited = url.split("//")
@@ -127,82 +218,79 @@ class WebmasterManager:
         yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443{add_subfolder}"
         self.sm.driver.get(yandex_url)
         self.gs.write_cell(write_link_col, yandex_url, True, row_num)
-    
-    def add_turbo(self,row_num):
-        self.__open_url(row_num,"ТУРБО!B","ТУРБО!H","/turbo/sources/")
-        turbo = self.gs.read_cell("ТУРБО!D", True, row_num)
-        try: 
+
+    def add_turbo(self, row_num):
+        self.__open_url(row_num, "B", "H", "/turbo/sources")
+        turbo = self.gs.read_cell("E", True, row_num)
+        try:
             self.sm.el_by_xpath("//div[contains(text(),'вам не принадлежит')]")
-            self.gs.write_cell("ТУРБО!F", "не принадлежит", True, row_num)
+            self.gs.write_cell("F", "не принадлежит", True, row_num)
         except:
-            try:  
+            try:
                 self.sm.wait_until_presence("//input[@name='feedUrl']")
 
                 self.sm.el_by_xpath("//input[@name='feedUrl']").click()
                 self.sm.el_by_xpath("//input[@name='feedUrl']").clear()
-                self.sm.el_by_xpath("//input[@name='feedUrl']").send_keys(turbo)
+                self.sm.el_by_xpath(
+                    "//input[@name='feedUrl']").send_keys(turbo)
 
-                self.sm.el_by_xpath("//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
-                
+                self.sm.el_by_xpath(
+                    "//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
+
                 self.sm.wait_until_presence("//td[text()='Без ошибок']")
                 self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
                 try:
-                    self.sm.wait_until_presence("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']",5)
-                    self.sm.el_by_xpath("//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
+                    self.sm.wait_until_presence(
+                        "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 5)
+                    self.sm.el_by_xpath(
+                        "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
                     self.sm.wait_until_presence("//td[text()='Проверяется']")
-                    self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
+                    self.gs.write_cell("F", "Проверяется", True, row_num)
                 except:
                     self.sm.wait_until_presence("//td[text()='Проверяется']")
-                    self.gs.write_cell("ТУРБО!F", "Проверяется", True, row_num)
+                    self.gs.write_cell("F", "Проверяется", True, row_num)
             except:
-                self.gs.write_cell("ТУРБО!F", "Что-то не так", True, row_num)
+                self.gs.write_cell("F", "Что-то не так", True, row_num)
 
-    def add_metrika(self,row_num):
+    def add_metrika(self, row_num):
         self.__open_url(row_num, "A", "C", "/settings/metrika/")
         sleep(0.5)
         try:
-            self.sm.driver.find_element(By.XPATH,"//*[text()='Связан с сайтом в Вебмастере']")
+            self.sm.driver.find_element(
+                By.XPATH, "//*[text()='Связан с сайтом в Вебмастере']")
             return "Был"
         except:
             try:
                 btn_path = "//span[text()='Подтвердить']/parent::button"
-                self.sm.driver.find_element(By.XPATH,btn_path).click()
-                self.sm.wait_until_presence("//*[text()='Связан с сайтом в Вебмастере']")
+                self.sm.driver.find_element(By.XPATH, btn_path).click()
+                self.sm.wait_until_presence(
+                    "//*[text()='Связан с сайтом в Вебмастере']")
                 return "Добавлен"
             except:
-                return "Ошибка"    
+                return "Ошибка"
 
-    def save_load(self,row_num,status_array,range_letter="B"): 
+    def save_load(self, row_num, status_array, range_letter="B"):
         if len(status_array) == 10:
-            self.gs.write_column_from_array(f"{range_letter}{row_num-9}:{row_num + len(status_array)}", status_array)
+            self.gs.write_column_from_array(
+                f"{range_letter}{row_num-9}:{row_num + len(status_array)}", status_array)
         if len(status_array) < 10:
-            self.gs.write_column_from_array(f"{range_letter}{row_num-len(status_array)+1}:{row_num}", status_array)
-            
+            self.gs.write_column_from_array(
+                f"{range_letter}{row_num-len(status_array)+1}:{row_num}", status_array)
+
 
 sm = SeleniumManager()
-wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
+wm = WebmasterManager(sm, "1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
+# names = wm.gs.get_values("C")
+# domens = wm.gs.get_values("D")
+for row_id in range(37,97):
+    wm.add_turbo(row_id)
 
-max_range = 77
-status_array = []
+sleep(100)
+# max_range = 76
+# status_array = []
 
-
-for row_num in range(2,max_range):
-    status = wm.add_sitemap(row_num)
-    print(status)
-    status_array.append(status)
-    if row_num % 10 == 0:
-        wm.save_load(row_num,status_array,"C")
-        status_array = []
-    if max_range - row_num == 1:
-            wm.save_load(row_num,status_array,"C")
-            status_array = []
-
-
-#сайтмапы
 # for row_num in range(2,max_range):
-#     status = wm.add_sitemap(row_num)
-#     print(status)
-#     status_array.append(status)
+#     status_array.append(wm.add_sitemap(row_num))
 #     if row_num % 10 == 0:
 #         wm.save_load(row_num,status_array,"C")
 #         status_array = []
@@ -210,7 +298,7 @@ for row_num in range(2,max_range):
 #             wm.save_load(row_num,status_array,"C")
 #             status_array = []
 
-#Для отладки
+# Для отладки
 # for row_num in wm.gs.find_cell_with_word("F","не принадлежит","ТУРБО"):
 #     wm.add_turbo(row_num)
 #     sleep(5)
