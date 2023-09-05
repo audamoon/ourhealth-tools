@@ -49,42 +49,34 @@ class WebmasterManager:
             except:
                 return "Ошибка"
 
-    def add_region(self, i):
-        print("Row num: ", i)
-        url = self.gs.read_cell("A", True, i)
-        url_splited = url.split("//")
-        city_name = self.gs.read_cell("B", True, i)
-        print(url,city_name)
-        contact_url = url + "/kontakty/"
-        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/serp-snippets/regions/"
-        self.gs.write_cell("D", yandex_url, True, i)
+    def add_region(self, row_num):
+        self.__open_url(row_num,"B","D","/serp-snippets/regions/")
+        city_name = self.gs.read_cell("A", True, row_num)
+        contact_url = self.gs.read_cell("F", True, row_num)
         try:
-            self.sm.driver.get(yandex_url)
             self.sm.el_by_xpath(
-                '(//li[@class="regions-list__item"][text()="регион сайта не задан"])[2]')
+                '(//li[@class="RegionsList-Item"]/*[text()="регион сайта не задан"])[2]')
             self.sm.el_by_xpath("(//button)[5]").click()
             self.sm.el_by_xpath("(//button)[6]").click()
             self.saveRegion(city_name, contact_url)
-            self.gs.write_cell("C", "Добавлен", True, i)
+            return "Добавлен"
         except:
             try:
                 self.sm.el_by_xpath(
-                    f"(//li[@class='regions-list__item'][contains(text(),'{city_name}')])")
-                self.gs.write_cell("C", "Уже был", True, i)
-                sleep(1)
+                    f"(//li[@class='RegionsList-Item']/*[contains(text(),'{city_name}')])")
+                return "Уже был"
             except:
-                self.gs.write_cell("C", "Чета не так", True, i)
-                sleep(1)
+                return "Ошибка"
 
     def saveRegion(self, keys, contacts):
         try:
-            self.sm.el_by_xpath("(//input[@class='input__control'])[1]").click()
-            self.sm.el_by_xpath("(//input[@class='input__control'])[1]").send_keys(keys)
+            self.sm.el_by_xpath("(//input[@class='Textinput-Control'])[2]").click()
+            self.sm.el_by_xpath("(//input[@class='Textinput-Control'])[2]").send_keys(keys)
             sleep(1)
-            self.sm.el_by_xpath("//span[@class='suggest2-item__text'][1]").click()
-            self.sm.el_by_xpath("(//input[@class='input__control'])[2]").send_keys(contacts)
+            self.sm.el_by_xpath("//li[@class='Suggest-Item'][1]").click()
+            self.sm.el_by_xpath("//input[@id='addRegions_addInfoLink']").send_keys(contacts)
             sleep(1)
-            self.sm.el_by_xpath(".//span[text()='Сохранить']/parent::button").click()
+            self.sm.el_by_xpath("//button[@class='Button2 Button2_size_s Button2_theme_action']").click()
             sleep(3)
         except:
             self.sm.driver.refresh()
@@ -105,11 +97,10 @@ class WebmasterManager:
         self.gs.write_column_from_array(f"A1:A{len(links)}",links)
 
     def delete_sitemap(self):
-        self.sm.wait_until_presence("//button[@aria-label='Удалить']",10)
+        self.sm.wait_until_presence("//button[@aria-label='Удалить']",1)
         self.sm.el_by_xpath("//button[@aria-label='Удалить']").click()
 
     def add_sitemap(self, row_num):
-        self.__
         self.__open_url(row_num, "B", "D", "/indexing/sitemap/")
         sitemap = self.gs.read_cell("F",True, row_num)
         try:
@@ -191,17 +182,33 @@ class WebmasterManager:
 sm = SeleniumManager()
 wm = WebmasterManager(sm,"1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
 
-max_range = 76
+max_range = 77
 status_array = []
 
+
 for row_num in range(2,max_range):
-    status_array.append(wm.add_sitemap(row_num))
+    status = wm.add_sitemap(row_num)
+    print(status)
+    status_array.append(status)
     if row_num % 10 == 0:
         wm.save_load(row_num,status_array,"C")
         status_array = []
     if max_range - row_num == 1:
             wm.save_load(row_num,status_array,"C")
             status_array = []
+
+
+#сайтмапы
+# for row_num in range(2,max_range):
+#     status = wm.add_sitemap(row_num)
+#     print(status)
+#     status_array.append(status)
+#     if row_num % 10 == 0:
+#         wm.save_load(row_num,status_array,"C")
+#         status_array = []
+#     if max_range - row_num == 1:
+#             wm.save_load(row_num,status_array,"C")
+#             status_array = []
 
 #Для отладки
 # for row_num in wm.gs.find_cell_with_word("F","не принадлежит","ТУРБО"):
