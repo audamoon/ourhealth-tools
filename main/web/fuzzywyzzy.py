@@ -38,13 +38,8 @@ services.ClearArray()
 
 givenOpt = services.array
 
-options = uc.ChromeOptions()
-options.add_argument(
-    '--user-data-dir=C:\\Users\\Sergey\\AppData\\Local\\Google\\Chrome\\User Data')
-#options.add_argument("headless")
 driver = uc.Chrome(
-    browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe", options=options)
-#driver.set_window_size(1000, 1080)
+    browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe")
 
 for link in links.array:
     with open ("main/web/result.txt","a", encoding="UTF-8") as f_result:
@@ -57,23 +52,29 @@ for link in links.array:
     driver.get(link)
     sleep(2)
 
-    text_containers = driver.execute_script("return document.querySelectorAll('.narkolog-suptitle')")
+    big_texts = driver.execute_script("return document.querySelectorAll('.text-main__content')")
     # text_containers = driver.find_elements(By.XPATH, "//p")
     #.narkolog-suptitle .text-section__container 
 
-    text_str = ''
+    sentence = ''
 
-    for block in text_containers:
-        text_str += block.text
-    text_str = text_str.split('.')
+    for big_text in big_texts:
+        sentence += big_text.text
+    sentences = sentence.split('.')
 
-    for sequence in text_str:
-        for service in givenOpt:
-            ratio = fuzz.WRatio(sequence.lower(),service)
-            if ratio >= 87:
-                with open ("main/web/result.txt","a", encoding="UTF-8") as f_result:
-                    f_result.write(f"Элемент [{sequence.strip()}] \n")
-                    f_result.write(f"Совпадение по слову \"{service}\" - {ratio}%\n")
+    splited_sentence = []
+
+    for sentence in sentences:
+        splited_sentence.append(sentence.split(','))
+
+    for bunch_of_words in splited_sentence:
+        for words in bunch_of_words:
+            for service in givenOpt:
+                ratio = fuzz.WRatio(words.lower(),service)
+                if ratio >= 87:
+                    with open ("main/web/result.txt","a", encoding="UTF-8") as f_result:
+                        f_result.write(f"Элемент [{words.strip()}] \n")
+                        f_result.write(f"Совпадение по слову \"{service}\" - {ratio}%\n")
                     
     with open ("main/web/result.txt","a", encoding="UTF-8") as f_result:
         f_result.write('='*50 + "\n")

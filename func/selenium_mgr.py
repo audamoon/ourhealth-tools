@@ -18,12 +18,14 @@ class SeleniumProfile(ABC):
 class SeleniumChromeProfile(SeleniumProfile):
 
     user_path = (os.environ['LOCALAPPDATA'] + "\\Google\\Chrome\\User Data")
+    
     def create_driver(self):
         super().create_driver()
         self.options = uc.ChromeOptions()
         self.options.add_argument(f"--user-data-dir={self.user_path}")
         self.driver = uc.Chrome(
             browser_executable_path="C:\Program Files\Google\Chrome\Application\chrome.exe", options=self.options)
+        
     def get_driver(self):
         return self.driver
         

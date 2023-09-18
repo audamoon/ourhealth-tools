@@ -45,9 +45,6 @@ class WebmasterManager:
         save_btn = self.sm.driver.find_element(By.XPATH, "button button_size_m button_theme_action button_align_left form__submit form__submit_align_left i-bem")
         save_btn.click()
 
-        
-
-        
 
     def create_table(self):
         self.sm.driver.get(
@@ -117,7 +114,7 @@ class WebmasterManager:
                 self.gs.write_cell("G", "Чета не так", True, i)
 
     def bypass_counters(self, row_num):
-        self.__open_url(row_num, "A", "E", "/indexing/crawl-metrika/")
+        self.__open_url(row_num, "B", "D", "/indexing/crawl-metrika/")
         try:
             self.sm.driver.find_element(
                 By.XPATH, '//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
@@ -178,11 +175,8 @@ class WebmasterManager:
             sleep(0.5)
             links_el = self.sm.driver.find_elements(
                 By.XPATH, f"//a[@class='Link SitesTableCell-Hostname']")
-            # for el in links_el:
-            #     links.append(el.text)
             for el in links_el:
-                if ".clinic" in el.text:
-                    links.append(el.text)
+                links.append(el.text)
         self.gs.write_column_from_array(f"A1:A{len(links)}", links)
 
     def delete_sitemap(self):
@@ -252,6 +246,23 @@ class WebmasterManager:
             except:
                 self.gs.write_cell("F", "Что-то не так", True, row_num)
 
+    def check_turbo(self, row_num):
+        self.__open_url(row_num, "A", "D", "/turbo/sources")
+        try:    
+            sm.driver.find_element(By.XPATH, '//button[contains(@class,"button_delete_yes")]').click()
+            sleep(0.5)
+            sm.driver.find_element(By.XPATH, '//button[contains(@class,"confirm__confirm")]').click()
+            sleep(0.1)
+            sm.driver.find_element(By.XPATH, "//td[@class='turbo-source__type luna-table__cell']")
+            # sm.driver.find_element(By.XPATH, "//button[contains(@class,'tumbler__button')][@aria-pressed='false']").click()
+            # self.sm.wait_until_presence(
+            #             "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 1)
+            # self.sm.el_by_xpath(
+            #     "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
+            return "Удалил"
+        except:
+            return "Не удалил"
+
     def add_metrika(self, row_num):
         self.__open_url(row_num, "A", "C", "/settings/metrika/")
         sleep(0.5)
@@ -279,13 +290,30 @@ class WebmasterManager:
 
 
 sm = SeleniumManager()
-wm = WebmasterManager(sm, "1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
-# names = wm.gs.get_values("C")
-# domens = wm.gs.get_values("D")
-for row_id in range(37,97):
-    wm.add_turbo(row_id)
+wm = WebmasterManager(sm, "1bbU7BPXn6PpebVbqbLQiR_qKRBUZ-tEqxLv5fmDAX3Y")
 
-sleep(100)
+max_range = 944
+status_array = []
+for row_num in range(46,max_range):
+    status_array.append(wm.check_turbo(row_num))
+    if row_num % 10 == 0:
+        wm.save_load(row_num,status_array,"C")
+        status_array = []
+    if max_range - row_num == 1:
+            wm.save_load(row_num,status_array,"C")
+            status_array = []
+
+
+# names = wm.gs.get_values("B")
+# for name in names:
+#     sm.driver.get(f"https://webmaster.yandex.ru/site/{name[0]}:443/dashboard/")
+
+
+# domens = wm.gs.get_values("D")
+# for row_id in range(37,97):
+#     wm.add_turbo(row_id)
+
+# sleep(100)
 # max_range = 76
 # status_array = []
 
