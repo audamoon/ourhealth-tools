@@ -7,10 +7,10 @@ driver = ChromeConfigurator.get_driver()
 gs = SheetManager()
 gs.start_service("1ICruRu0RJi7dmyf7ugAo7poE6SvFuoiVns3Tv29aeQs")
 
-EMAIL_RANGE = "B:B"
+LOGIN_RANGE = "B:B"
 URL_RANGE = "G:G"
 
-with open ("collect/data/Sites.json", "r", encoding="UTF-8") as sites_json:
+with open ("json/sites.json", "r", encoding="UTF-8") as sites_json:
     sites_data = json.load(sites_json)
 
 urls = gs.reader.read_range(URL_RANGE)
@@ -18,7 +18,7 @@ with open("result.txt","a",encoding="utf-8") as result_file:
             result_file.write("URL;Number1;Number2;VK;OK;WP;TG\n")
 
 for site in sites_data["sites"]:
-    row_ids = gs.reader.find_row_id_by_word(EMAIL_RANGE, site["email"])
+    row_ids = gs.reader.find_row_id_by_word(LOGIN_RANGE, site["login"])
     collector = SiteCollector()
     collector.set_options(driver)
     

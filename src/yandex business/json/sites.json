@@ -1,0 +1,31 @@
+{
+    "sites" : [
+        {
+            "login":"probuzhdenie-clinic@yandex.ru"
+        },
+        {
+            "login":"our-health-center@yandex.ru"
+        },
+        {
+            "login":"official.doctor@yandex.ru"
+        },
+        {
+            "login":"chastniy.medic@yandex.ru"
+        },
+        {
+            "login":"narkolog.express@yandex.ru"
+        },
+        {
+            "login":"svetlayalinia@yandex.ru"
+        },
+        {
+            "login":"trezvost.rehab.v@yandex.ru"
+        },
+        {
+            "login":"narkologia24-7@yandex.ru"
+        },
+        {
+            "login":"eleanamed@yandex.ru"
+        }
+    ]
+}
