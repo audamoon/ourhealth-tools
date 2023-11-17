@@ -1,6 +1,5 @@
 import undetected_chromedriver as uc
 import os
-from gseleniumconf.profiles import ProfileID
 
 
 class ChromeConfigurator:
