@@ -208,33 +208,32 @@ class WebmasterManager:
             return "не принадлежит"
         except:
             self.delete_turbo()
-            # try:
-                
-            #     self.sm.wait_until_presence("//input[@name='feedUrl']")
-            #     self.sm.el_by_xpath("//input[@name='feedUrl']").click()
-            #     self.sm.el_by_xpath("//input[@name='feedUrl']").clear()
-            #     self.sm.el_by_xpath(
-            #         "//input[@name='feedUrl']").send_keys(turbo)
-            #     self.sm.el_by_xpath(
-            #         "//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
-            #     # self.sm.wait_until_presence("//td[text()='Без ошибок']")
+            try:    
+                self.sm.wait_until_presence("//input[@name='feedUrl']")
+                self.sm.el_by_xpath("//input[@name='feedUrl']").click()
+                self.sm.el_by_xpath("//input[@name='feedUrl']").clear()
+                self.sm.el_by_xpath(
+                    "//input[@name='feedUrl']").send_keys(turbo)
+                self.sm.el_by_xpath(
+                    "//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
+                # self.sm.wait_until_presence("//td[text()='Без ошибок']")
 
-            #     WebDriverWait(self.sm.driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Откл']/parent::div")))
-            #     self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
+                WebDriverWait(self.sm.driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Откл']/parent::div")))
+                self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
 
-            #     try:
-            #         self.sm.wait_until_presence(
-            #             "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 5)
-            #         #вот ниже если мы делаем с удалить турбо на надо 2-ю по счету искать п отому что это пидорас создает второе окошко
-            #         self.sm.el_by_xpath(
-            #             "(//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited'])[1]").click()
-            #         self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
-            #         return "Проверяется"
-            #     except:
-            #         self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
-            #         return "Проверяется"
-            # except:
-            #     return "Что-то не так"
+                try:
+                    self.sm.wait_until_presence(
+                        "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 5)
+                    #вот ниже если мы делаем с удалить турбо на надо 2-ю по счету искать п отому что это пидорас создает второе окошко
+                    self.sm.el_by_xpath(
+                        "(//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited'])[1]").click()
+                    self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
+                    return "Проверяется"
+                except:
+                    self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
+                    return "Проверяется"
+            except:
+                return "Что-то не так"
 
     def check_turbo(self, row_num):
         self.__open_url(row_num, "A", "D", "/turbo/sources")

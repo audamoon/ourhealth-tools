@@ -5,6 +5,9 @@ class WMSheetCells:
     STATUS = "C:C"
     LINK_TO_WM = "D:D"
 
+    def get_range_between(letter, first, second):
+        return f"{letter}{first}:{letter}{second}"
+
 class WMWorkResults:
     INCORRECT_LINK = "Указана некорректная ссылка/Нет ссылки"
     UNKNOW_FUNC = "Искомой функции в модуле не найдено"
