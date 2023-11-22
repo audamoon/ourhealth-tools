@@ -59,7 +59,7 @@ class WMController:
             min_index = int(result_range[0][0])
             max_index = int(result_range[len(result_range) - 1][0])
             self.gs.writer.write_range(WMSheetCells.get_range_between(
-                "B", min_index, max_index), list(map(lambda x: x[1], result_range)))
+                "C", min_index, max_index), list(map(lambda x: x[1], result_range)))
             self.gs.writer.write_range(WMSheetCells.get_range_between(
                 "D", min_index, max_index), list(map(lambda x: x[2].replace("\n", ""), result_range)))
 
