@@ -1,5 +1,9 @@
 class GoogleSheetWriter:
-    def set_options(self, service, sheet_id):
+    def get_self(self, service, sheet_id):
+        self.__set_options(service, sheet_id)
+        return self
+
+    def __set_options(self, service, sheet_id):
         self.service = service
         self.sheet_id = sheet_id
 
@@ -48,4 +52,3 @@ class GoogleSheetWriter:
             'values': [[value1] for value1 in value]
         }
         return self.service.spreadsheets().values().update(spreadsheetId=self.sheet_id, range=column_range, valueInputOption=valueInputOption, body=body).execute()
-

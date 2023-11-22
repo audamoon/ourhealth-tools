@@ -1,6 +1,9 @@
 class GoogleSheetReader:
+    def get_self(self, service, sheet_id):
+        self.__set_options(service, sheet_id)
+        return self
 
-    def set_options(self, service, sheet_id):
+    def __set_options(self, service, sheet_id):
         self.service = service
         self.sheet_id = sheet_id
 
@@ -16,7 +19,8 @@ class GoogleSheetReader:
 
         read_cell("Sheet1!B1")
         """
-        cell_data_array = self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=range).execute()
+        cell_data_array = self.service.spreadsheets().values().get(
+            spreadsheetId=self.sheet_id, range=range).execute()
         array_key = "values"
         if array_key in cell_data_array:
             return self.service.spreadsheets().values().get(spreadsheetId=self.sheet_id, range=range).execute()['values'][0][0]
@@ -59,8 +63,8 @@ class GoogleSheetReader:
             except:
                 pass
         return row_numbers
-    
-    def find_row_id_by_two_word(self, first_sheet_range,second_sheet_range, first_word, second_word):
+
+    def find_row_id_by_two_word(self, first_sheet_range, second_sheet_range, first_word, second_word):
         """
         usage example:
 
@@ -74,7 +78,7 @@ class GoogleSheetReader:
         """
         status_from_sheet_first = self.read_range(first_sheet_range)
         status_from_sheet_second = self.read_range(second_sheet_range)
-        
+
         row_numbers = []
         for i in range(len(status_from_sheet_first)):
             try:

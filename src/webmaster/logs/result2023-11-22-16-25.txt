@@ -1,0 +1,7 @@
+3;Выполнено успешно;https://webmaster.yandex.ru/site/https:astrahan.neoplus-clinic.ru:443/turbo/settings/menu/
+4;Выполнено успешно;https://webmaster.yandex.ru/site/https:balashikha.neoplus-clinic.ru:443/turbo/settings/menu/
+5;Выполнено успешно;https://webmaster.yandex.ru/site/https:barnaul.neoplus-clinic.ru:443/turbo/settings/menu/
+6;Выполнено успешно;https://webmaster.yandex.ru/site/https:belgorod.neoplus-clinic.ru:443/turbo/settings/menu/
+7;Выполнено успешно;https://webmaster.yandex.ru/site/https:bryansk.neoplus-clinic.ru:443/turbo/settings/menu/
+8;Выполнено успешно;https://webmaster.yandex.ru/site/https:vladivostok.neoplus-clinic.ru:443/turbo/settings/menu/
+9;Выполнено успешно;https://webmaster.yandex.ru/site/https:vladikavkaz.neoplus-clinic.ru:443/turbo/settings/menu/
