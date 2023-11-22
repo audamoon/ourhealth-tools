@@ -2,8 +2,8 @@ import undetected_chromedriver as uc
 import re
 from selenium.webdriver.common.by import By
 from sheethelper.manager import SheetManager
-from WMEnum import WMSheetCells
-from WMTableManager import WMMainMenu, WMTopMenu
+from modules.WMEnum import WMSheetCells
+from modules.WMTableManager import WMMainMenu, WMTopMenu
 
 
 class WMController:
@@ -59,9 +59,9 @@ class WMController:
             min_index = int(result_range[0][0])
             max_index = int(result_range[len(result_range) - 1][0])
             self.gs.writer.write_range(WMSheetCells.get_range_between(
-                "B", min_index + 1, max_index + 1), list(map(lambda x: x[1], result_range)))
+                "B", min_index, max_index), list(map(lambda x: x[1], result_range)))
             self.gs.writer.write_range(WMSheetCells.get_range_between(
-                "D", min_index + 1, max_index + 1), list(map(lambda x: x[2].replace("\n", ""), result_range)))
+                "D", min_index, max_index), list(map(lambda x: x[2].replace("\n", ""), result_range)))
 
     def getSites(self):
         ALL_SITES_LINK = "https://webmaster.yandex.ru/sites/?page="

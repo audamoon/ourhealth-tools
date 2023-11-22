@@ -1,8 +1,8 @@
 import undetected_chromedriver as uc
 from sheethelper.manager import SheetManager
-from WMElement import WMElement
-from WMController import WMController
-from WMEnum import WMSheetCells
+from modules.WMElement import WMElement
+from modules.WMController import WMController
+from modules.WMEnum import WMSheetCells
 from datetime import datetime
 
 
@@ -37,3 +37,6 @@ class WMManager:
 
     def getMenu(self, data_origin, menu_type, project="domain_name"):
         self.controller.getMenu(data_origin, project, menu_type)
+
+    def saveResult(self, file_path):
+        self.controller.saveResult(file_path)

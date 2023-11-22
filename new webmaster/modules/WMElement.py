@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from WMController import WMController
-from WMEnum import WMWorkResults
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from WMTableManager import WMMainMenu, WMTopMenu
+from modules.WMController import WMController
+from modules.WMEnum import WMWorkResults
+from modules.WMTableManager import WMMainMenu, WMTopMenu
 
 
 class WMElement(ABC):
@@ -131,8 +131,17 @@ class TurboMenu(WMElement):
         self.status = WMWorkResults.SUCCESS
 
     def addMain(self):
+        SUCC_MESSAGE = "//*[text()='Общая информация о сайте сохранена']"
+        SAVE_BTN = "//button[contains(@class,'form__submit')]"
+
         mm = WMMainMenu(self.controller.driver, self.additional)
         mm.createMenu(self.domain)
+
+        self.controller.driver.find_element(By.XPATH, SAVE_BTN).click()
+
+        WebDriverWait(self.controller.driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, SUCC_MESSAGE)))
+        
         self.status = WMWorkResults.SUCCESS
 
 class Counter(WMElement):

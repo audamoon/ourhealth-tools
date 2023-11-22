@@ -46,7 +46,7 @@ class WMMenu(ABC):
             input_value = values[i].replace('\n', '')
             if (re.match(r'https:\/\/.+[.][a-z]+', values[i])):
                 site_uri = re.sub(r'https:\/\/.+[.][a-z]+', "", values[i])
-                input_value = f"{site}{site_uri}"
+                input_value = f"{site}{site_uri}".replace('\n', '')
             inputs[i].click()
             inputs[i].clear()
             inputs[i].send_keys(input_value)
