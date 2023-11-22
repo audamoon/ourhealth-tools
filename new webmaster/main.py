@@ -4,24 +4,26 @@ from selenium.webdriver.common.by import By
 from WMManager import WMManager
 from WMElement import Turbo
 from WMTableManager import WMTableManager
-
+import time
 gs = SheetManager("1_yFLyApmyz-ra-NS9kVnh2H5lka6pM-VnOzF6izsSdI")
 
 driver = ChromeConfigurator.get_driver()
 
-wm = WMManager(driver, gs)
 
-wm.mod_launch(Turbo, ["add"])
+tm = WMTableManager(driver)
 
-
-
-
-# driver.get("https://webmaster.yandex.ru/site/https:neoplus-clinic.ru:443/turbo/settings/menu/")
-
-# tm = WMTableManager(driver)
-
-# site = 'arkhangelsk.neoplus-clinic.ru'
-# project = "neoplus"
-# origin_link = "https://webmaster.yandex.ru/site/https:neoplus-clinic.ru:443/turbo/settings/menu/"
-# tm.input_values_in_menus("top", project, site)
-# wm = WMManager(driver, gs)
+site = 'abaza.neoplus-clinic.ru'
+project = "neoplus"
+origin_link = "https://webmaster.yandex.ru/site/https:neoplus-clinic.ru:443/turbo/settings/menu/"
+subd_link = "https://webmaster.yandex.ru/site/https:abaza.neoplus-clinic.ru:443/turbo/settings/menu/"
+driver.get(origin_link)
+tm.read_menu_levels("top", project)
+tm.read_menu_levels("main", project)
+tm.collect_menu_inputs("top", project)
+tm.collect_menu_inputs("main", project)
+driver.get(subd_link )
+tm.create_table("top", project)
+tm.input_values_in_menus("top", project, site)
+tm.create_table("main", project)
+tm.input_values_in_menus("main", project, site)
+time.sleep(1000)

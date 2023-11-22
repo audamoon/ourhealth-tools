@@ -31,7 +31,8 @@ class WMController:
 
     def save_result_to_sheet(self, file_path):
         with open(file_path, "r", encoding="UTF-8") as result_file:
-            results = list(map(lambda x: x.split(";"), result_file.readlines()))
+            results = list(
+                map(lambda x: x.split(";"), result_file.readlines()))
 
         g = 0
         results_ranged = [[]]
@@ -50,14 +51,13 @@ class WMController:
                 if (i == len(results) - 1):
                     results_ranged[g].append(results[i])
 
-        for rr in results_ranged:
-            min_index = int(rr[0][0])
-            max_index = int(rr[len(rr) - 1][0])
-            self.gs.writer.write_range(WMSheetCells.get_range_between("B", min_index + 1, max_index + 1), list(map(lambda x: x[1], rr)))
-            self.gs.writer.write_range(WMSheetCells.get_range_between("D", min_index + 1, max_index + 1), list(map(lambda x: x[2].replace("\n",""), rr)))
-
-
-
+        for result_range in results_ranged:
+            min_index = int(result_range[0][0])
+            max_index = int(result_range[len(result_range) - 1][0])
+            self.gs.writer.write_range(WMSheetCells.get_range_between(
+                "B", min_index + 1, max_index + 1), list(map(lambda x: x[1], result_range)))
+            self.gs.writer.write_range(WMSheetCells.get_range_between(
+                "D", min_index + 1, max_index + 1), list(map(lambda x: x[2].replace("\n", ""), result_range)))
 
     def collect_sites(self):
         ALL_SITES_LINK = "https://webmaster.yandex.ru/sites/?page="
