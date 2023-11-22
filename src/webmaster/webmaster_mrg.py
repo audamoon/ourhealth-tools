@@ -117,47 +117,47 @@ class WebmasterManager:
     #         except:
     #             return "Ошибка"
 
-    def add_region(self, row_num):
-        self.__open_url(row_num, "B", "F", "/serp-snippets/regions/")
-        city_name = self.gs.read_cell("A", True, row_num)
-        contact_url = self.gs.read_cell("C", True, row_num)
-        try:
-            self.sm.el_by_xpath(
-                '(//li[@class="RegionsList-Item"]/*[text()="регион сайта не задан"])[2]')
-            self.sm.el_by_xpath(
-                "//button[contains(@class,'RegionsPage-PlusButton')]").click()
-            self.sm.wait_until_presence(
-                "//span[text()='Добавить регион']/parent::span/parent::button", 5)
-            self.sm.el_by_xpath(
-                "//span[text()='Добавить регион']/parent::span/parent::button").click()
-            self.saveRegion(city_name, contact_url)
-            return "Добавлен"
-        except:
-            try:
-                self.sm.el_by_xpath(
-                    f"(//li[@class='RegionsList-Item']/*[contains(text(),'{city_name}')])")
-                return "Уже был"
-            except:
-                return "Ошибка"
+    # def add_region(self, row_num):
+    #     self.__open_url(row_num, "B", "F", "/serp-snippets/regions/")
+    #     city_name = self.gs.read_cell("A", True, row_num)
+    #     contact_url = self.gs.read_cell("C", True, row_num)
+    #     try:
+    #         self.sm.el_by_xpath(
+    #             '(//li[@class="RegionsList-Item"]/*[text()="регион сайта не задан"])[2]')
+    #         self.sm.el_by_xpath(
+    #             "//button[contains(@class,'RegionsPage-PlusButton')]").click()
+    #         self.sm.wait_until_presence(
+    #             "//span[text()='Добавить регион']/parent::span/parent::button", 5)
+    #         self.sm.el_by_xpath(
+    #             "//span[text()='Добавить регион']/parent::span/parent::button").click()
+    #         self.saveRegion(city_name, contact_url)
+    #         return "Добавлен"
+    #     except:
+    #         try:
+    #             self.sm.el_by_xpath(
+    #                 f"(//li[@class='RegionsList-Item']/*[contains(text(),'{city_name}')])")
+    #             return "Уже был"
+    #         except:
+    #             return "Ошибка"
 
-    def saveRegion(self, keys, contacts):
-        try:
-            inputRegionXPATH = "(//input[@class='yc-text-input__control yc-text-input__control_type_input'])[3]"
-            self.sm.wait_until_presence(inputRegionXPATH, 5)
-            self.sm.el_by_xpath(inputRegionXPATH).click()
-            self.sm.el_by_xpath(inputRegionXPATH).send_keys(keys)
-            sleep(1)
-            self.sm.el_by_xpath(
-                "//div[@class='RegionSuggest-Item'][1]").click()
-            self.sm.el_by_xpath(
-                "//input[@class='yc-text-input__control yc-text-input__control_type_input'][@type='url']").send_keys(contacts)
-            sleep(1)
-            self.sm.el_by_xpath(
-                "//span[text()='Сохранить']/parent::span/parent::button").click()
-            sleep(3)
-        except:
-            self.sm.driver.refresh()
-            sleep(3)
+    # def saveRegion(self, keys, contacts):
+    #     try:
+    #         inputRegionXPATH = "(//input[@class='yc-text-input__control yc-text-input__control_type_input'])[3]"
+    #         self.sm.wait_until_presence(inputRegionXPATH, 5)
+    #         self.sm.el_by_xpath(inputRegionXPATH).click()
+    #         self.sm.el_by_xpath(inputRegionXPATH).send_keys(keys)
+    #         sleep(1)
+    #         self.sm.el_by_xpath(
+    #             "//div[@class='RegionSuggest-Item'][1]").click()
+    #         self.sm.el_by_xpath(
+    #             "//input[@class='yc-text-input__control yc-text-input__control_type_input'][@type='url']").send_keys(contacts)
+    #         sleep(1)
+    #         self.sm.el_by_xpath(
+    #             "//span[text()='Сохранить']/parent::span/parent::button").click()
+    #         sleep(3)
+    #     except:
+    #         self.sm.driver.refresh()
+    #         sleep(3)
 
     # def collect_sites(self, amount_of_sites):
     #     pages = (amount_of_sites/20)+1
@@ -197,14 +197,14 @@ class WebmasterManager:
         except:
             return "Ошибка"
 
-    def __open_url(self, row_num, get_link_col, write_link_col, add_subfolder):
-        print("Row num: ", row_num)
-        url = self.gs.read_cell(get_link_col, True, row_num)
-        url_splited = url.split("//")
-        print(url_splited)
-        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443{add_subfolder}"
-        self.sm.driver.get(yandex_url)
-        self.gs.write_cell(write_link_col, yandex_url, True, row_num)
+    # def __open_url(self, row_num, get_link_col, write_link_col, add_subfolder):
+    #     print("Row num: ", row_num)
+    #     url = self.gs.read_cell(get_link_col, True, row_num)
+    #     url_splited = url.split("//")
+    #     print(url_splited)
+    #     yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443{add_subfolder}"
+    #     self.sm.driver.get(yandex_url)
+    #     self.gs.write_cell(write_link_col, yandex_url, True, row_num)
 
     # def add_turbo(self, row_num):
     #     self.__open_url(row_num, "A", "D", "/turbo/sources")
@@ -299,22 +299,22 @@ class WebmasterManager:
     #         sleep(1)
 
 
-sm = SeleniumManager()
-wm = WebmasterManager(sm, "1_yFLyApmyz-ra-NS9kVnh2H5lka6pM-VnOzF6izsSdI")
+# sm = SeleniumManager()
+# wm = WebmasterManager(sm, "1_yFLyApmyz-ra-NS9kVnh2H5lka6pM-VnOzF6izsSdI")
 
 # wm.collect_sites(1076)
 # exit()
-min_range = 11
-max_range = 1412
-status_array = []
-for row_num in range(min_range, max_range):
-    status_array.append(wm.add_region(row_num))
-    if row_num % 10 == 0:
-        wm.save_load(row_num, status_array, "D")
-        status_array = []
-    if max_range - row_num == 1:
-        wm.save_load(row_num, status_array, "D")
-        status_array = []
+# min_range = 11
+# max_range = 1412
+# status_array = []
+# for row_num in range(min_range, max_range):
+#     status_array.append(wm.add_region(row_num))
+#     if row_num % 10 == 0:
+#         wm.save_load(row_num, status_array, "D")
+#         status_array = []
+#     if max_range - row_num == 1:
+#         wm.save_load(row_num, status_array, "D")
+#         status_array = []
 
 
 # names = wm.gs.get_values("B")
