@@ -16,6 +16,7 @@ class WMController:
         self.gs = gs
         self.domains = gs.reader.read_range(WMSheetCells.DOMAIN)
         self.additional = gs.reader.read_range(WMSheetCells.ADDITIONAL)
+        self.cities = gs.reader.read_range(WMSheetCells.CITIES)
 
     def openLink(self, link):
         self.driver.get(link)
@@ -23,15 +24,22 @@ class WMController:
     def getDomain(self, row_id):
         return self.domains[row_id-1][0]
 
+    def getAdd(self, row_id):
+        if len(self.additional) > row_id:
+            return self.additional[row_id-1][0]
+        return ""
+    
+    def getCity(self, row_id):
+        if len(self.cities) > row_id:
+                return self.cities[row_id-1][0]
+        return ""
+
     def getLink(self, row_id, uri):
         domain_parts = re.findall(
             r'(https:)?\/?\/?([a-z-.]+)[\/]?', self.domains[row_id-1][0], re.IGNORECASE)
         return f"{self.BASIC_URI}{self.PROTOCOL}:{domain_parts[0][1]}:{self.PORT}{uri}" if len(domain_parts) != 0 else False
 
-    def getAdd(self, row_id):
-        if len(self.additional) > row_id:
-            return self.additional[row_id-1][0]
-        return ""
+    
 
     def saveResult(self, file_path):
         with open(file_path, "r", encoding="UTF-8") as result_file:
@@ -59,9 +67,9 @@ class WMController:
             min_index = int(result_range[0][0])
             max_index = int(result_range[len(result_range) - 1][0])
             self.gs.writer.write_range(WMSheetCells.get_range_between(
-                "C", min_index, max_index), list(map(lambda x: x[1], result_range)))
+                WMSheetCells.STATUS_SAVE, min_index, max_index), list(map(lambda x: x[1], result_range)))
             self.gs.writer.write_range(WMSheetCells.get_range_between(
-                "D", min_index, max_index), list(map(lambda x: x[2].replace("\n", ""), result_range)))
+                WMSheetCells.LINK_SAVE, min_index, max_index), list(map(lambda x: x[2].replace("\n", ""), result_range)))
 
     def getSites(self):
         ALL_SITES_LINK = "https://webmaster.yandex.ru/sites/?page="

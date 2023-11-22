@@ -29,6 +29,7 @@ class WMElement(ABC):
         Возвращает строку, в которой находится результат выполнения
         service(row_id, mod)
         """
+        self.city = self.controller.getCity(row_id)
         self.domain = self.controller.getDomain(row_id)
         self.additional = self.controller.getAdd(row_id)
         self._openLink(row_id)
@@ -111,6 +112,7 @@ class Turbo(WMElement):
 
         self.status = WMWorkResults.SUCCESS
 
+
 class TurboMenu(WMElement):
     URI = '/turbo/settings/menu/'
     status: str = ""
@@ -140,22 +142,80 @@ class TurboMenu(WMElement):
         self.controller.driver.find_element(By.XPATH, SAVE_BTN).click()
 
         WebDriverWait(self.controller.driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, SUCC_MESSAGE)))
-        
+            EC.presence_of_element_located((By.XPATH, SUCC_MESSAGE)))
+
         self.status = WMWorkResults.SUCCESS
 
+
 class Counter(WMElement):
-    def bypass():
-        pass
+    URI = '/indexing/crawl-metrika/'
+    status: str = ""
+
+    def __init__(self, controller: WMController):
+        super().__init__(controller)
+        self.functions = {"bypass": self.bypass}
+
+    def bypass(self):
+        elements = self.controller.driver.execute_script(
+                    "let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
+        if len(elements) != 0:
+            for el in elements:
+                el.click()
+        self.status = WMWorkResults.SUCCESS
+
 
 class Region(WMElement):
-    def add():
-        pass
+    URI = "/serp-snippets/regions/"
+    status: str = ""
+    
+    def __init__(self, controller: WMController):
+        super().__init__(controller)
+        self.functions = {"add": self.add}
+
+    def add(self):
+        CHECK_REG_XPATH = '(//li[@class="RegionsList-Item"]/*[text()="регион сайта не задан"])[2]'
+        PLUS_XPATH = "//button[contains(@class,'RegionsPage-PlusButton')]"
+        ADD_REG_BTN_XPATH = "//span[text()='Добавить регион']/parent::span/parent::button"
+        INPUT_REG_XPATH = "(//input[@class='yc-text-input__control yc-text-input__control_type_input'])[3]"
+        FIRST_SUGGEST_XPATH = "//div[@class='RegionSuggest-Item'][1]"
+        CONTACT_INPUT_XPATH = "//input[@class='yc-text-input__control yc-text-input__control_type_input'][@type='url']"
+        SAVE_XPATH = "//span[text()='Сохранить']/parent::span/parent::button"
+        CHECK_SAVE_XPATH = "//*[text()='Заявка принята в обработку']"
+        controller = self.controller
+
+        try:
+            controller.driver.find_element(By.XPATH, CHECK_REG_XPATH)
+        except:
+            self.status = WMWorkResults.WAS
+            return
+
+        controller.driver.find_element(By.XPATH, PLUS_XPATH).click()
+        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, ADD_REG_BTN_XPATH)))
+        controller.driver.find_element(By.XPATH, ADD_REG_BTN_XPATH).click()
+        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, INPUT_REG_XPATH)))
+        input_reg = controller.driver.find_element(By.XPATH, INPUT_REG_XPATH)
+        input_reg.click()
+        input_reg.clear()
+        input_reg.send_keys(self.city)
+        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, FIRST_SUGGEST_XPATH)))
+        controller.driver.find_element(By.XPATH, FIRST_SUGGEST_XPATH).click()
+        input_contact = controller.driver.find_element(By.XPATH, CONTACT_INPUT_XPATH)
+        input_contact.click()
+        input_contact.clear()
+        input_contact.send_keys(self.additional)
+        controller.driver.find_element(By.XPATH,  SAVE_XPATH).click()
+        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, CHECK_SAVE_XPATH)))
+        controller.driver.find_element(By.XPATH,  CHECK_SAVE_XPATH)
+        self.status = WMWorkResults.SUCCESS
+        
+
+
+
 
 class Sitemap(WMElement):
     def reload():
         pass
-    
+
     def delete():
         pass
 
