@@ -111,7 +111,6 @@ class Turbo(WMElement):
 
         self.status = WMWorkResults.SUCCESS
 
-
 class TurboMenu(WMElement):
     URI = '/turbo/settings/menu/'
     status: str = ""
@@ -135,3 +134,21 @@ class TurboMenu(WMElement):
         mm = WMMainMenu(self.controller.driver, self.additional)
         mm.createMenu(self.domain)
         self.status = WMWorkResults.SUCCESS
+
+class Counter(WMElement):
+    def bypass():
+        pass
+
+class Region(WMElement):
+    def add():
+        pass
+
+class Sitemap(WMElement):
+    def reload():
+        pass
+    
+    def delete():
+        pass
+
+    def add():
+        pass
