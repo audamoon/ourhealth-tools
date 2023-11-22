@@ -78,14 +78,9 @@ class WebmasterManager:
                 for lvl3_num in range(amount_of_lvl_3[n][k]-1):
                     add_lvl_3_btns[k].click()
 
-    def sitemap_reload(self, i):
-        print("Row num: ", i)
-        url = self.gs.read_cell("A", True, i)
-        url_splited = url.split("//")
-        yandex_url = f"https://webmaster.yandex.ru/site/{url_splited[0]}{url_splited[1]}:443/indexing/sitemap/"
-        self.gs.write_cell("H", yandex_url, True, i)
+    def sitemap_reload(self, row_num):
+        self.__open_url(row_num, "A", "C", "/indexing/sitemap/")
         try:
-            self.sm.driver.get(yandex_url)
             self.sm.el_by_xpath(
                 "//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']")
             btn = self.sm.el_by_xpath(
@@ -93,17 +88,17 @@ class WebmasterManager:
             btn.click()
             sm.wait_until_presence(
                 "//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
-            self.gs.write_cell("G", "Отправлено", True, i)
+            return 'Отправлено'
         except:
             try:
                 self.sm.el_by_xpath(
                     "//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]")
-                self.gs.write_cell("G", "Уже было", True, i)
+                return 'Было'
             except:
-                self.gs.write_cell("G", "Чета не так", True, i)
+                return "Чета не так"
 
     def bypass_counters(self, row_num):
-        self.__open_url(row_num, "B", "E", "/indexing/crawl-metrika/")
+        self.__open_url(row_num, "A", "E", "/indexing/crawl-metrika/")
         try:
             self.sm.driver.find_element(
                 By.XPATH, '//span[text()="Установите на сайт счётчик Яндекс Метрики"]')
@@ -125,11 +120,12 @@ class WebmasterManager:
     def add_region(self, row_num):
         self.__open_url(row_num,"B","F","/serp-snippets/regions/")
         city_name = self.gs.read_cell("A", True, row_num)
-        contact_url = self.gs.read_cell("E", True, row_num)
+        contact_url = self.gs.read_cell("C", True, row_num)
         try:
             self.sm.el_by_xpath(
                 '(//li[@class="RegionsList-Item"]/*[text()="регион сайта не задан"])[2]')
             self.sm.el_by_xpath("//button[contains(@class,'RegionsPage-PlusButton')]").click()
+            self.sm.wait_until_presence("//span[text()='Добавить регион']/parent::span/parent::button",5)
             self.sm.el_by_xpath("//span[text()='Добавить регион']/parent::span/parent::button").click()
             self.saveRegion(city_name, contact_url)
             return "Добавлен"
@@ -143,17 +139,19 @@ class WebmasterManager:
 
     def saveRegion(self, keys, contacts):
         try:
-            self.sm.el_by_xpath("(//input[@class='Textinput-Control'])[2]").click()
-            self.sm.el_by_xpath("(//input[@class='Textinput-Control'])[2]").send_keys(keys)
+            inputRegionXPATH = "(//input[@class='yc-text-input__control yc-text-input__control_type_input'])[3]"
+            self.sm.wait_until_presence(inputRegionXPATH,5)
+            self.sm.el_by_xpath(inputRegionXPATH).click()
+            self.sm.el_by_xpath(inputRegionXPATH).send_keys(keys)
             sleep(1)
-            self.sm.el_by_xpath("//li[@class='Suggest-Item'][1]").click()
+            self.sm.el_by_xpath("//div[@class='RegionSuggest-Item'][1]").click()
             self.sm.el_by_xpath("//input[@class='yc-text-input__control yc-text-input__control_type_input'][@type='url']").send_keys(contacts)
             sleep(1)
             self.sm.el_by_xpath("//span[text()='Сохранить']/parent::span/parent::button").click()
             sleep(3)
         except:
             self.sm.driver.refresh()
-            sleep(4)
+            sleep(3)
 
     def collect_sites(self, amount_of_sites):
         pages = (amount_of_sites/20)+1
@@ -203,51 +201,53 @@ class WebmasterManager:
         self.gs.write_cell(write_link_col, yandex_url, True, row_num)
 
     def add_turbo(self, row_num):
-        self.__open_url(row_num, "B", "H", "/turbo/sources")
-        turbo = self.gs.read_cell("E", True, row_num)
+        self.__open_url(row_num, "A", "D", "/turbo/sources")
+        turbo = self.gs.read_cell("B", True, row_num)
         try:
             self.sm.el_by_xpath("//div[contains(text(),'вам не принадлежит')]")
-            self.gs.write_cell("F", "не принадлежит", True, row_num)
+            return "не принадлежит"
         except:
-            try:
+            self.delete_turbo()
+            try:    
                 self.sm.wait_until_presence("//input[@name='feedUrl']")
-
                 self.sm.el_by_xpath("//input[@name='feedUrl']").click()
                 self.sm.el_by_xpath("//input[@name='feedUrl']").clear()
                 self.sm.el_by_xpath(
                     "//input[@name='feedUrl']").send_keys(turbo)
-
                 self.sm.el_by_xpath(
                     "//button[@class='button button_side_right button_theme_action button_align_left button_size_m one-line-submit__submit form__submit i-bem button_js_inited']").click()
+                # self.sm.wait_until_presence("//td[text()='Без ошибок']")
 
-                self.sm.wait_until_presence("//td[text()='Без ошибок']")
+                WebDriverWait(self.sm.driver, 60).until(EC.element_to_be_clickable((By.XPATH, "//div[text()='Откл']/parent::div")))
                 self.sm.el_by_xpath("//div[text()='Откл']/parent::div").click()
+
                 try:
                     self.sm.wait_until_presence(
                         "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 5)
+                    #вот ниже если мы делаем с удалить турбо на надо 2-ю по счету искать п отому что это пидорас создает второе окошко
                     self.sm.el_by_xpath(
-                        "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
-                    self.sm.wait_until_presence("//td[text()='Проверяется']")
-                    self.gs.write_cell("F", "Проверяется", True, row_num)
+                        "(//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited'])[1]").click()
+                    self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
+                    return "Проверяется"
                 except:
-                    self.sm.wait_until_presence("//td[text()='Проверяется']")
-                    self.gs.write_cell("F", "Проверяется", True, row_num)
+                    self.sm.wait_until_presence("//td[text()='Проверяется']", 3)
+                    return "Проверяется"
             except:
-                self.gs.write_cell("F", "Что-то не так", True, row_num)
+                return "Что-то не так"
 
     def check_turbo(self, row_num):
         self.__open_url(row_num, "A", "D", "/turbo/sources")
         try:    
-            sm.driver.find_element(By.XPATH, '//button[contains(@class,"button_delete_yes")]').click()
-            sleep(0.5)
-            sm.driver.find_element(By.XPATH, '//button[contains(@class,"confirm__confirm")]').click()
-            sleep(0.1)
-            sm.driver.find_element(By.XPATH, "//td[@class='turbo-source__type luna-table__cell']")
-            # sm.driver.find_element(By.XPATH, "//button[contains(@class,'tumbler__button')][@aria-pressed='false']").click()
-            # self.sm.wait_until_presence(
-            #             "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 1)
-            # self.sm.el_by_xpath(
-            #     "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
+            # sm.driver.find_element(By.XPATH, '//button[contains(@class,"button_delete_yes")]').click()
+            # sleep(0.5)
+            # sm.driver.find_element(By.XPATH, '//button[contains(@class,"confirm__confirm")]').click()
+            # sleep(0.1)
+            # sm.driver.find_element(By.XPATH, "//td[@class='turbo-source__type luna-table__cell']")
+            sm.driver.find_element(By.XPATH, "//button[contains(@class,'tumbler__button')][@aria-pressed='false']").click()
+            self.sm.wait_until_presence(
+                        "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']", 1)
+            self.sm.el_by_xpath(
+                "//button[@class='button button_theme_action button_size_s confirm__confirm i-bem button_js_inited']").click()
             return "Удалил"
         except:
             return "Не удалил"
@@ -277,15 +277,29 @@ class WebmasterManager:
             self.gs.write_column_from_array(
                 f"{range_letter}{row_num-len(status_array)+1}:{row_num}", status_array)
 
+    def delete_turbo(self):
+        print("начинаю удоление")
+        deleteBtns = self.sm.driver.find_elements(
+            By.XPATH, "//button[@class='button button_delete_yes button_only-icon_yes button_theme_clear button_size_s luna-table__delete turbo-source__delete i-bem']")
+        for deletebtn in deleteBtns:
+            deletebtn.click()
+            sleep(2)
+            self.sm.driver.find_element(By.XPATH, "//span[text()='Удалить']/parent::button").click()
+            sleep(1)
+
+    
+
 
 sm = SeleniumManager()
-wm = WebmasterManager(sm, "1h_FM0dD7IxgHMMa1WIe_OQtDSRJtoirUg4PfVjj_XHI")
+wm = WebmasterManager(sm, "1_yFLyApmyz-ra-NS9kVnh2H5lka6pM-VnOzF6izsSdI")
 
-min_range = 17
-max_range = 65
+# wm.collect_sites(1076)
+# exit()
+min_range = 11
+max_range = 1412
 status_array = []
 for row_num in range(min_range,max_range):
-    status_array.append(wm.add_sitemap(row_num))
+    status_array.append(wm.add_region(row_num))
     if row_num % 10 == 0:
         wm.save_load(row_num,status_array,"D")
         status_array = []
