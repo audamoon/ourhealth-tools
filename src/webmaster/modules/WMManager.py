@@ -35,7 +35,7 @@ class WMManager:
             for link in links:
                 log_file.write(f"{link}\n")
 
-    def getMenu(self, data_origin, menu_type, project="domain_name"):
+    def getMenu(self, data_origin, menu_type, project=""):
         self.controller.getMenu(data_origin, project, menu_type)
 
     def saveResult(self, file_path):

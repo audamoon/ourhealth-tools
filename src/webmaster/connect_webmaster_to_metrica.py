@@ -17,7 +17,7 @@ def ClickButtons(driver:uc.Chrome, path_to_button):
 
 driver = ChromeConfigurator.get_driver()
 
-id = "64744489"
+id = "87033584"
 driver.get(f"https://metrika.yandex.ru/settings?id={id}")
 sleep(1)
 driver.execute_script('document.querySelector(".counter-edit__counter-buttons.counter-edit__counter-buttons_show_yes").remove()')
@@ -25,7 +25,7 @@ driver.execute_script('document.querySelector(".counter-edit__counter-buttons.co
 connect = ".//span[text()='Привязать к Вебмастеру']/parent::button"
 back = "//span[text()='Отменить']/parent::button"
 reconnect = "//span[text()='Отправить запрос ещё раз']/parent::button"
-
-ClickButtons(driver, back)
-ClickButtons(driver, reconnect)
+ClickButtons(driver, connect)
+# ClickButtons(driver, back)
+# ClickButtons(driver, reconnect)
 driver.quit()
