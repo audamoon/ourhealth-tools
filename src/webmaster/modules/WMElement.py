@@ -218,6 +218,11 @@ class Sitemap(WMElement):
     RI = "/indexing/sitemap/"
     status: str = ""
 
+    def __init__(self, controller: WMController):
+        super().__init__(controller)
+        self.functions = {"reload": self.reload,
+                          "delete": self.delete, "add": self.add}
+
     def reload(self):
         CHECK_INFO_XPATH = "//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']"
         RELOAD_BTN_XPATH = "//button[contains(@class,'button_size_xs')]/parent::div"
