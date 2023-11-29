@@ -157,7 +157,7 @@ class Counter(WMElement):
 
     def bypass(self):
         elements = self.controller.driver.execute_script(
-                    "let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
+            "let a = document.querySelectorAll('.tumbler__disabled-label');arr = new Array;for (let i = 0; i < a.length; i++) {if (window.getComputedStyle(a[i]).display != 'none'){arr.push(a[i])}};return arr;")
         if len(elements) != 0:
             for el in elements:
                 el.click()
@@ -167,7 +167,7 @@ class Counter(WMElement):
 class Region(WMElement):
     URI = "/serp-snippets/regions/"
     status: str = ""
-    
+
     def __init__(self, controller: WMController):
         super().__init__(controller)
         self.functions = {"add": self.add}
@@ -190,34 +190,67 @@ class Region(WMElement):
             return
 
         controller.driver.find_element(By.XPATH, PLUS_XPATH).click()
-        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, ADD_REG_BTN_XPATH)))
+        WebDriverWait(controller.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, ADD_REG_BTN_XPATH)))
         controller.driver.find_element(By.XPATH, ADD_REG_BTN_XPATH).click()
-        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, INPUT_REG_XPATH)))
+        WebDriverWait(controller.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, INPUT_REG_XPATH)))
         input_reg = controller.driver.find_element(By.XPATH, INPUT_REG_XPATH)
         input_reg.click()
         input_reg.clear()
         input_reg.send_keys(self.city)
-        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, FIRST_SUGGEST_XPATH)))
+        WebDriverWait(controller.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, FIRST_SUGGEST_XPATH)))
         controller.driver.find_element(By.XPATH, FIRST_SUGGEST_XPATH).click()
-        input_contact = controller.driver.find_element(By.XPATH, CONTACT_INPUT_XPATH)
+        input_contact = controller.driver.find_element(
+            By.XPATH, CONTACT_INPUT_XPATH)
         input_contact.click()
         input_contact.clear()
         input_contact.send_keys(self.additional)
         controller.driver.find_element(By.XPATH,  SAVE_XPATH).click()
-        WebDriverWait(controller.driver, 5).until(EC.element_to_be_clickable((By.XPATH, CHECK_SAVE_XPATH)))
+        WebDriverWait(controller.driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, CHECK_SAVE_XPATH)))
         controller.driver.find_element(By.XPATH,  CHECK_SAVE_XPATH)
         self.status = WMWorkResults.SUCCESS
-        
-
-
 
 
 class Sitemap(WMElement):
-    def reload():
-        pass
+    RI = "/indexing/sitemap/"
+    status: str = ""
 
-    def delete():
-        pass
+    def reload(self):
+        CHECK_INFO_XPATH = "//div[@class='tooltip__content'][text()='Отправить файл Sitemap на переобход']"
+        RELOAD_BTN_XPATH = "//button[contains(@class,'button_size_xs')]/parent::div"
+        CHECK_SEND_XPATH = "//div[@class='tooltip__content'][contains(text(),'Файл был отправлен на переобход')]"
+        controller = self.controller
+        WebDriverWait(controller.driver, 3).until(
+            EC.element_to_be_clickable((By.XPATH, CHECK_INFO_XPATH)))
+        controller.driver.find_element(By.XPATH, RELOAD_BTN_XPATH).click()
+        WebDriverWait(controller.driver, 3).until(
+            EC.element_to_be_clickable((By.XPATH, CHECK_SEND_XPATH)))
+        self.status = WMWorkResults.SUCCESS
 
-    def add():
-        pass
+    def delete(self):
+        DELETE_BTN_XPATH = "//button[@aria-label='Удалить']"
+        controller = self.controller
+        WebDriverWait(controller.driver, 3).until(
+            EC.element_to_be_clickable((By.XPATH, DELETE_BTN_XPATH)))
+        controller.driver.find_element(By.XPATH, DELETE_BTN_XPATH).click()
+        self.status = WMWorkResults.SUCCESS
+
+    def add(self):
+        SITEMAP_INPUT_XPATH = "//input[@name='sitemapUrl']"
+        ADD_BTN_XPATH = "//span[@class='button__text'][text()='Добавить']/parent::button"
+        CHECK_SUCCESS = "//p[@class='sitemap-files__queue-title'][text()='Очередь на обработку']"
+        controller = self.controller
+        WebDriverWait(controller.driver, 3).until(
+            EC.element_to_be_clickable((By.XPATH, SITEMAP_INPUT_XPATH)))
+        input_btn = controller.driver.find_element(
+            By.XPATH, SITEMAP_INPUT_XPATH)
+        input_btn.click()
+        input_btn.clear()
+        input_btn.send_keys(self.additional)
+        controller.driver.find_element(By.XPATH, ADD_BTN_XPATH)
+        WebDriverWait(controller.driver, 3).until(
+            EC.presence_of_element_located((By.XPATH, CHECK_SUCCESS)))
+        self.status = WMWorkResults.SUCCESS

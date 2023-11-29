@@ -36,7 +36,7 @@ class WMController:
 
     def getLink(self, row_id, uri):
         domain_parts = re.findall(
-            r'(https:)?\/?\/?([a-z-.]+)[\/]?', self.domains[row_id-1][0], re.IGNORECASE)
+            r'(https:)?\/?\/?([a-z-.1-9]+)[\/]?', self.domains[row_id-1][0], re.IGNORECASE)
         return f"{self.BASIC_URI}{self.PROTOCOL}:{domain_parts[0][1]}:{self.PORT}{uri}" if len(domain_parts) != 0 else False
 
     
